@@ -6,17 +6,17 @@
   <title>Animaプロンプト管理ツール</title>
   <style>
     :root {
-      --bg: #0f1115;
-      --panel: #171a21;
-      --panel-2: #1f2430;
-      --line: #31384a;
-      --text: #e8ecf3;
-      --sub: #aeb7c7;
-      --accent: #8e7dff;
-      --accent-2: #5cc8ff;
-      --good: #2db983;
-      --warn: #e0a100;
-      --bad: #d85c5c;
+      --bg: #101217;
+      --panel: #1a1d26;
+      --panel-2: #232832;
+      --line: #3b4151;
+      --text: #edf0f4;
+      --sub: #b1b8c7;
+      --accent: #a595cb;
+      --accent-2: #85b6b0;
+      --good: #6b9a88;
+      --warn: #bd9f7f;
+      --bad: #ca858e;
       --shadow: 0 8px 24px rgba(0,0,0,.25);
       --radius: 14px;
       --radius-sm: 10px;
@@ -27,7 +27,7 @@
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: linear-gradient(180deg, #0c0e12 0%, #11151d 100%);
+      background: radial-gradient(ellipse at 80% 0%, rgba(113,102,142,.10), transparent 44%), linear-gradient(180deg, #111318 0%, #161922 100%);
       color: var(--text);
       font-family: var(--sans);
       line-height: 1.5;
@@ -44,7 +44,7 @@
     }
 
     .hero {
-      background: linear-gradient(135deg, rgba(142,125,255,.18), rgba(92,200,255,.12));
+      background: linear-gradient(120deg, rgba(134,145,166,.12), rgba(77,130,121,.07));
       border: 1px solid rgba(255,255,255,.08);
       border-radius: 20px;
       padding: 18px 20px;
@@ -65,8 +65,8 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 360px minmax(0, 1fr);
-      gap: 16px;
+      grid-template-columns: 375px minmax(0, 1fr);
+      gap: 20px;
       align-items: start;
     }
 
@@ -78,11 +78,11 @@
 
     .left, .right {
       display: grid;
-      gap: 16px;
+      gap: 20px;
     }
 
     .panel {
-      background: rgba(23,26,33,.95);
+      background: rgba(26,29,38,.97);
       border: 1px solid rgba(255,255,255,.08);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -102,11 +102,12 @@
     .panel .hd h2 {
       font-size: 1rem;
     }
+    @media(max-width: 520px) { .panel .hd { flex-wrap: wrap; } }
 
     .panel .bd {
-      padding: 16px;
+      padding: 18px;
       display: grid;
-      gap: 12px;
+      gap: 16px;
     }
 
     .stack { display: grid; gap: 12px; }
@@ -116,7 +117,7 @@
 
     label.lbl {
       display: grid;
-      gap: 6px;
+      gap: 8px;
       font-size: .92rem;
       color: var(--sub);
     }
@@ -156,34 +157,58 @@
 
     button {
       appearance: none;
-      border: 1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, #292f3d, #222836);
+      border: 1px solid rgba(220,227,238,.14);
+      background: #303642;
       color: var(--text);
-      border-radius: 12px;
-      padding: 10px 14px;
+      border-radius: 9px;
+      padding: 9px 13px;
       font: inherit;
       cursor: pointer;
-      transition: transform .06s ease, opacity .15s ease, background .15s ease, border-color .15s ease;
+      transition: background-color .15s ease, border-color .15s ease, transform .06s ease;
     }
-
-    button:hover { border-color: rgba(255,255,255,.18); }
+    button:hover { background: #3a4150; border-color: rgba(220,227,238,.28); }
+    button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
     button:active { transform: translateY(1px); }
     button.primary {
-      background: linear-gradient(180deg, #7567ff, #5f53d6);
-      border-color: rgba(255,255,255,.12);
+      background: #5e6687;
+      border-color: #7780a0;
+      color: #fcfcff;
     }
+    button.primary:hover { background: #707b9f; }
     button.good {
-      background: linear-gradient(180deg, #2eaf7f, #248d67);
+      background: #3d7166;
+      border-color: #548c80;
+      color: #f2fcfa;
     }
+    button.good:hover { background: #478477; }
     button.warn {
-      background: linear-gradient(180deg, #b8860b, #8d6807);
+      background: #725d50;
+      border-color: #927866;
+      color: #fff5ed;
     }
+    button.warn:hover { background: #806959; }
     button.bad {
-      background: linear-gradient(180deg, #b54f4f, #8f3f3f);
+      background: #56363c;
+      border-color: #85585f;
+      color: #f2d6d9;
     }
-    button.ghost {
-      background: transparent;
+    button.bad:hover { background: #684148; }
+    button.ghost { background: transparent; }
+    button.reset-inline {
+      background: #56363c;
+      border-color: #85585f;
+      color: #f2d6d9;
+      font-size: .82rem;
+      padding: 7px 10px;
+      white-space: nowrap;
     }
+    button.reset-inline:hover { background: #684148; }
+    .danger-settings-row {
+      display: flex; align-items: center; justify-content: flex-end;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding-top: 10px;
+    }
+    .danger-settings-row button { font-size: .82rem; }
 
     .section-card {
       border: 1px solid rgba(255,255,255,.07);
@@ -192,18 +217,22 @@
       background: rgba(255,255,255,.02);
     }
 
+    /* セクション見出しは従来の約1.5倍 */
     .section-title {
-      padding: 10px 12px;
+      margin: 0;
+      padding: 16px 18px;
       background: rgba(255,255,255,.03);
       border-bottom: 1px solid rgba(255,255,255,.07);
-      font-weight: 600;
-      font-size: .95rem;
+      color: var(--text);
+      line-height: 1.3;
+      font-weight: 700;
+      font-size: 1.425rem;
     }
 
     .section-body {
-      padding: 12px;
+      padding: 18px;
       display: grid;
-      gap: 10px;
+      gap: 18px;
     }
 
     details.person {
@@ -225,7 +254,13 @@
       user-select: none;
     }
     details.person summary::-webkit-details-marker { display: none; }
-    .person-body { padding: 14px 16px; display: grid; gap: 12px; }
+    details.person summary > span:first-child {
+      font-size: 1.425rem;
+      line-height: 1.3;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .person-body { padding: 18px; display: grid; gap: 18px; }
 
     .badge {
       font-size: .78rem;
@@ -307,11 +342,38 @@
     .image-draft-preview.visible { display: block; }
     .field-label {
       display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
-      color: var(--sub); font-size: .92rem;
+      color: var(--text); font-size: inherit;
     }
     .field-code {
-      font: .77rem var(--mono); color: #aaa4f0; opacity: .95;
+      font: .77rem var(--mono); color: #b3a9c9; opacity: .95;
       overflow-wrap: anywhere;
+    }
+
+    /* 各入力項目は従来の約1.3倍。テキスト入力の本文は元サイズを維持 */
+    #positiveArea label.lbl,
+    #negativeArea label.lbl {
+      font-size: 1.196rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    #positiveArea label.lbl input,
+    #positiveArea label.lbl textarea,
+    #positiveArea label.lbl select,
+    #negativeArea label.lbl input,
+    #negativeArea label.lbl textarea,
+    #negativeArea label.lbl select {
+      font-size: .95rem;
+      font-weight: 400;
+    }
+    #positiveArea label.lbl .hint,
+    #negativeArea label.lbl .hint {
+      font-size: .83rem;
+      font-weight: 400;
+      color: var(--sub);
+    }
+    @media (max-width: 500px) {
+      .section-title, details.person summary > span:first-child { font-size: 1.3rem; }
+      #positiveArea label.lbl, #negativeArea label.lbl { font-size: 1.09rem; }
     }
 
     .slot-item {
@@ -400,6 +462,154 @@
     .muted { color: var(--sub); }
     .small { font-size: .82rem; }
 
+    /* ポジティブはスモーキーな青緑、ネガティブはくすんだワイン色 */
+    .positive-panel > .hd {
+      background: linear-gradient(95deg, rgba(69,122,118,.24), rgba(69,122,118,.035));
+      border-bottom-color: rgba(112,169,160,.27);
+    }
+    .negative-panel > .hd {
+      background: linear-gradient(95deg, rgba(131,76,96,.21), rgba(131,76,96,.03));
+      border-bottom-color: rgba(174,105,121,.27);
+    }
+    #positiveArea .section-card, #positiveArea details.person {
+      border-color: rgba(111,158,154,.23);
+      background: rgba(111,158,154,.035);
+    }
+    #negativeArea .section-card {
+      border-color: rgba(173,113,129,.23);
+      background: rgba(173,113,129,.032);
+    }
+    #positiveArea .section-title, #positiveArea details.person summary {
+      background: linear-gradient(90deg, rgba(68,118,115,.18), transparent);
+      border-left: 3px solid #78aaa2;
+    }
+    #negativeArea .section-title {
+      background: linear-gradient(90deg, rgba(142,82,100,.18), transparent);
+      border-left: 3px solid #b77b8e;
+    }
+    #positiveArea textarea:focus, #positiveArea select:focus {
+      border-color: #78aaa2;
+      box-shadow: 0 0 0 3px rgba(120,170,162,.13);
+    }
+    #negativeArea textarea:focus {
+      border-color: #b77b8e;
+      box-shadow: 0 0 0 3px rgba(183,123,142,.13);
+    }
+    /* 編集欄のタイトル・案内・入力欄を共通部品化 */
+    .field-editor { display: grid; gap: 10px; min-width: 0; }
+    .field-editor-titlebar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; }
+    .field-editor-title {
+      font-size: 1.196rem; line-height: 1.4; font-weight: 650; color: #f4f6fa;
+    }
+    .field-editor-code { font: .76rem var(--mono); color: #b5b0c8; overflow-wrap: anywhere; }
+    .field-info-button {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; min-width: 26px; padding: 0;
+      border-radius: 50%; border: 1px solid rgba(144,179,175,.45);
+      background: rgba(122,156,155,.08); color: #cae1de;
+      line-height: 1; font-size: .96rem; font-weight: 700;
+    }
+    .field-info-button:hover, .field-info-button[aria-expanded="true"] {
+      border-color: rgba(144,179,175,.8); background: rgba(122,156,155,.24);
+    }
+    .field-guide {
+      border: 1px solid rgba(136,163,160,.26);
+      background: rgba(80,101,107,.14);
+      border-radius: 10px; padding: 12px 14px;
+      color: #dce3e9; font-size: .9rem; line-height: 1.7;
+    }
+    .field-guide[hidden] { display: none; }
+    .field-guide p { margin: 0 0 7px; }
+    .field-guide p:last-child { margin-bottom: 0; }
+    .field-guide code {
+      white-space: pre-wrap; overflow-wrap: anywhere; color: #d7e2ed;
+      font-size: .88rem; font-family: var(--mono);
+    }
+    .field-guide .field-guide-extra { font-size: .84rem; color: var(--sub); }
+    .field-editor textarea { width: 100%; font-size: .95rem; font-weight: 400; }
+    .field-editor--basic .field-editor-title { font-size: 1.05rem; }
+    .field-editor--basic input, .field-editor--basic select { font-size: .95rem; font-weight: 400; }
+    .input-prominent { color: #f3f5fa !important; font-weight: 700 !important; font-size: 1.05rem !important; }
+    .input-prominent > input { font-weight: 400; }
+
+    /* 書き出し結果は欄全体をクリックしてコピー可能 */
+    .copy-preview-field { display: grid; gap: 8px; min-width: 0; }
+    .copy-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .copy-preview-title { color: var(--text); font-size: 1rem; font-weight: 650; }
+    .copy-preview-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; font-size: .83rem; }
+    .copy-preview-btn svg { width: 16px; height: 16px; flex: 0 0 16px; }
+    textarea.copyable-preview {
+      cursor: copy; border: 1px solid rgba(136,166,172,.28);
+      background: rgba(22,27,35,.85);
+    }
+    textarea.copyable-preview:hover { border-color: rgba(136,189,186,.72); }
+    textarea.copyable-preview:focus-visible { outline: 2px solid #96c4be; outline-offset: 2px; }
+    .copy-preview-help { color: var(--sub); font-size: .83rem; }
+    @media (max-width: 500px) {
+      .field-editor-title { font-size: 1.09rem; }
+    }
+
+
+    /* 統合結果: 第3のテーマカラーとしてスモーキーな青を使用 */
+    .results-panel > .hd {
+      background: linear-gradient(95deg, rgba(70,107,163,.26), rgba(70,107,163,.04));
+      border-bottom-color: rgba(118,159,210,.34);
+    }
+    .results-panel > .hd h2 { color: #d3e4ff; }
+    .results-panel .bd { gap: 18px; }
+    .results-panel .kpi { font-size: .9rem; gap: 14px; }
+    .results-panel .copy-preview-field {
+      padding: 14px;
+      border: 1px solid rgba(115,149,189,.24);
+      border-radius: 13px;
+      background: rgba(69,102,145,.055);
+      gap: 10px;
+    }
+    .results-panel .copy-preview-title {
+      font-size: 1.26rem;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+    .results-panel textarea.copyable-preview {
+      font-size: 1.08rem;
+      line-height: 1.65;
+      color: #edf3fd;
+      padding: 14px 15px;
+      border-color: rgba(113,154,198,.32);
+      background: rgba(16,26,42,.79);
+    }
+    .results-panel textarea.copyable-preview:hover {
+      border-color: #7da7d2;
+      background: rgba(20,33,54,.93);
+    }
+    .results-panel textarea.copyable-preview:focus-visible {
+      outline: 2px solid #85abdf;
+      outline-offset: 2px;
+    }
+    .results-panel .preview > .copy-preview-field:first-child {
+      border-color: rgba(111,167,151,.31);
+    }
+    .results-panel .preview > .copy-preview-field:first-child .copy-preview-title {
+      color: #a9d7cc;
+    }
+    .results-panel .preview > .copy-preview-field:nth-child(2) {
+      border-color: rgba(184,115,136,.30);
+    }
+    .results-panel .preview > .copy-preview-field:nth-child(2) .copy-preview-title {
+      color: #e1acbe;
+    }
+    .results-panel > .bd > .copy-preview-field:last-child {
+      border-color: rgba(111,152,210,.36);
+    }
+    .results-panel > .bd > .copy-preview-field:last-child .copy-preview-title {
+      color: #b9d3fc;
+    }
+    @media (max-width: 500px) {
+      .results-panel .copy-preview-title { font-size: 1.16rem; }
+      .results-panel textarea.copyable-preview { font-size: 1rem; }
+      .results-panel .copy-preview-field { padding: 10px; }
+    }
+
     .site-footer {
       margin: 22px auto 0;
       padding: 18px 14px 8px;
@@ -433,44 +643,43 @@
       <div class="left">
         <div class="panel">
           <div class="hd">
-            <h2>基本設定</h2>
+            <h2>⚙️ 基本設定</h2>
             <span class="badge">自動保存対応</span>
           </div>
           <div class="bd">
             <div class="row">
-              <label class="lbl" style="flex:0 0 150px;">
-                人数
+              <label class="lbl input-prominent" style="flex:0 0 150px;">
+                👪 人数
                 <input id="personCount" type="number" min="1" max="6" step="1" />
               </label>
-              <div class="hint" style="flex:1 1 320px;">主要人物の人数（最大6人）を設定します。2人以上の場合、出力ではA・B…の識別記号を付けます。</div>
             </div>
 
             <div class="row" style="align-items:center;">
-              <label class="lbl" style="display:flex;align-items:center;gap:9px;">
+              <label class="lbl input-prominent" style="display:flex;align-items:center;gap:9px;">
                 <input id="enableMobs" type="checkbox" style="width:auto;" />
-                モブ・観衆（集団）を追加
+                👥 モブ・背景人物（集団）を追加
               </label>
-              <span class="hint">主要人物1人＋モブはA/B、主要人物2人＋群衆はA/B/Cで出力します。</span>
+              <button type="button" class="field-info-button" aria-expanded="false" aria-controls="enableMobsGuide" title="モブ追加の入力ガイド" aria-label="モブ追加の入力ガイドを開く">ⓘ</button>
+              <div id="enableMobsGuide" class="field-guide" hidden style="flex-basis:100%;">
+                <p>主役とは別に、背景人物・群衆・モンスターなどを追加します。主役1人＋モブではA/B、主役2人＋群衆ではA/B/Cとして出力します。</p>
+                <p><strong>記入例： </strong><code>主役2人＋鎧を着た敵兵集団 → 主役の人数「2」、モブを追加「ON」</code></p>
+              </div>
             </div>
-            <div class="row">
-              <button id="copyAllBtn" class="primary">統合をコピー</button>
-              <button id="copyPositiveBtn">ポジだけコピー</button>
-              <button id="copyNegativeBtn">ネガだけコピー</button>
-              <button id="resetBtn" class="ghost">現在の入力を初期化</button>
-            </div>
-
             <div class="status" id="autosaveStatus">自動保存の状態: 未保存</div>
-            <div class="hint">※ 入力内容はブラウザに自動保存されます。同じブラウザで再度開くと、前回の内容を復元します。</div>
+            <div class="hint">※ 入力内容はブラウザに自動保存されます。同じブラウザで再度開くと、前回の内容を復元します。タグ間はカンマで区切り、各入力欄の末尾のカンマは不要です。</div>
+            <div class="danger-settings-row">
+              <button id="clearInputsBtn" class="bad" type="button">すべての入力を消去</button>
+            </div>
           </div>
         </div>
 
         <div class="panel">
           <div class="hd">
-            <h2>保存スロット</h2>
+            <h2>💾 保存スロット</h2>
             <span class="badge">localStorage</span>
           </div>
           <div class="bd">
-            <label class="lbl">
+            <label class="lbl input-prominent">
               保存名
               <input id="slotName" type="text" placeholder="例: キャラクター立ち絵 / 二人構図" />
             </label>
@@ -488,8 +697,8 @@
               <div class="hint">画像は端末内で長辺320px以下に縮小され、スロット保存時に登録されます。外部サーバーには送信されません。</div>
             </div>
             <div class="row">
-              <button id="saveSlotBtn" class="good">新規保存</button>
-              <button id="overwriteSlotBtn" class="warn">同名を上書き保存</button>
+              <button id="saveSlotBtn" class="primary">新規保存</button>
+              <button id="overwriteSlotBtn" class="primary">同名を上書き保存</button>
               <button id="openAllSlotsBtn" type="button">全件一覧</button>
             </div>
             <div class="slot-summary-box">
@@ -503,7 +712,7 @@
             <div style="border-top:1px solid var(--line);padding-top:12px;" class="stack-sm">
               <strong>保存スロットのバックアップ</strong>
               <div class="row">
-                <button id="exportBackupBtn" type="button">JSONでバックアップ</button>
+                <button id="exportBackupBtn" class="primary" type="button">JSONでバックアップ</button>
               </div>
               <label class="lbl">バックアップを読み込む
                 <input id="importBackupFile" type="file" accept=".json,application/json" />
@@ -514,12 +723,31 @@
         </div>
         <div class="panel">
           <div class="hd">
-            <h2>エクスポート / インポート</h2>
+            <h2>📤 エクスポート / インポート</h2>
             <span class="badge">コメント見出し対応</span>
           </div>
           <div class="bd">
             <button id="exportTxtBtn" class="primary">統合プロンプトをTXT保存</button>
             <div class="hint"># ===== Face ===== のようなコメントを含め、ポジティブ・ネガティブを1つのファイルに書き出します。</div>
+            <div class="ai-template-box">
+              <div class="row" style="justify-content:space-between; align-items:flex-start; gap:12px;">
+                <div class="stack-sm" style="flex:1 1 320px;">
+                  <div class="ai-template-title">AI依頼用テンプレート</div>
+                  <div class="hint">ChatGPT / Gemini などに貼り付けるための依頼文です。希望する画像の説明からでも、参考画像を見せたうえでも使えます。</div>
+                </div>
+                <div class="row" style="justify-content:flex-end;">
+                  <button id="toggleAiTemplateBtn" class="primary" type="button">表示</button>
+                  <button id="copyAiTemplateBtn" class="primary" type="button">コピー</button>
+                  <button type="button" class="field-info-button" aria-expanded="false" aria-controls="aiTemplateGuide" title="AI依頼用テンプレートの説明" aria-label="AI依頼用テンプレートの説明を開く">ⓘ</button>
+                </div>
+              </div>
+              <div id="aiTemplateGuide" class="field-guide" hidden>
+                <p>AIに「このツールへ読み込める形式で出して」と依頼するためのテンプレートです。<strong>見出しはできるだけそのまま出力</strong>してもらうのが安全です。</p>
+                <p><strong>ポイント：</strong>不要な見出しは省略可 / 余計な前置きや解説文はなし / タグ欄はカンマ区切り / 自然言語欄は英文の短文でOK。</p>
+                <p><strong>自動設定：</strong>A〜Cが含まれていれば人物数を自動で合わせ、<code>Background group</code> 見出しがあればモブONにします。</p>
+              </div>
+              <textarea id="aiTemplateText" rows="12" readonly hidden></textarea>
+            </div>
             <label class="lbl">インポートするテキスト
               <textarea id="importText" rows="8" placeholder="# ===== Quality / style =====
 masterpiece, best quality,
@@ -537,24 +765,26 @@ masterpiece, best quality,
                 <option value="negative">ネガのみ（ポジは保持）</option>
               </select>
             </label>
-            <button id="importBtn" class="good">見出しから読み込む</button>
-            <div class="hint">同じ分類の見出しが複数ある場合は内容を結合します。例えば Outfit / Upper body と Outfit / Waist は、どちらも「衣装」に読み込まれます。既存の入力内容は上書きされるため、必要に応じて保存スロットに保存してください。</div>
+            <button id="importBtn" class="primary">見出しから読み込む</button>
+            <div class="hint">見出し付きプロンプトを、各入力欄に自動で振り分けます。人物の人数やモブの有無も自動設定されます。
+
+※読み込み対象の入力内容は上書きされます。必要に応じて事前に保存してください。</div>
             <div class="status" id="importStatus" aria-live="polite"></div>
           </div>
         </div>
       </div>
 
       <div class="right">
-        <div class="panel">
+        <div class="panel positive-panel">
           <div class="hd">
-            <h2>ポジティブ入力</h2>
-            <span class="badge">Anima向け</span>
+            <h2>✨ ポジティブ入力</h2>
+            <button id="resetPositiveBtn" class="reset-inline" type="button">ポジティブ入力をリセット</button>
           </div>
           <div class="bd" id="positiveArea">
             <div class="section-card">
-              <div class="section-title">画風</div>
+              <h3 class="section-title">🖼️ 画風</h3>
               <div class="section-body">
-                <label class="lbl">画風 / 品質
+                <label class="lbl">🎨 画風 / 品質（タグ・自由入力）
                   <textarea data-bind="common.qualityStyle" placeholder="例: masterpiece, best quality, painterly illustration, ..."></textarea>
                 </label>
               </div>
@@ -563,10 +793,10 @@ masterpiece, best quality,
             <div id="peopleContainer" class="stack"></div>
 
             <div class="section-card" id="mobSection" style="display:none;">
-              <div class="section-title">モブ・背景人物</div>
+              <h3 class="section-title">👥 モブ・背景人物</h3>
               <div class="section-body">
                 <div class="row">
-                  <label class="lbl" style="flex:1 1 220px;">モブの人数
+                  <label class="lbl input-prominent" style="flex:1 1 220px;">🔢 モブの人数
                     <select id="mobCount">
                       <option value="0">群衆（人数指定なし）</option>
                       <option value="1">1人</option>
@@ -576,7 +806,7 @@ masterpiece, best quality,
                       <option value="5">5人</option>
                     </select>
                   </label>
-                  <label class="lbl" style="flex:1 1 180px;">モブの種類
+                  <label class="lbl input-prominent" style="flex:1 1 180px;">🧬 モブの性別・種別
                     <select id="mobKind">
                       <option value="male">男性</option>
                       <option value="female">女性</option>
@@ -585,43 +815,69 @@ masterpiece, best quality,
                     </select>
                   </label>
                 </div>
-                <label class="lbl">モブの特徴・衣装（カンマ区切り）
-                  <textarea data-bind="mobs.appearance" placeholder="例: spectators, dark robes, simple clothing"></textarea>
+                <label class="lbl">🎭 モブの種類
+                  <select id="mobRole">
+                    <option value="custom">指定なし・自由入力（custom）</option>
+                    <option value="monsters">モンスター（monsters）</option>
+                    <option value="spectators">観衆・見物人（spectators）</option>
+                    <option value="crowd">群衆・人混み（crowd）</option>
+                    <option value="enemies">敵・敵対者（enemies）</option>
+                    <option value="enemySoldiers">敵兵（enemy soldiers）</option>
+                    <option value="soldiers">兵士（soldiers）</option>
+                    <option value="guards">衛兵・警備員（guards）</option>
+                    <option value="adventurers">冒険者（adventurers）</option>
+                    <option value="bandits">盗賊・ならず者（bandits）</option>
+                    <option value="passersby">住民・通行人（passersby）</option>
+                    <option value="nobles">貴族・上流階級（nobles）</option>
+                    <option value="undead">アンデッド（undead creatures）</option>
+                    <option value="animals">動物（animals）</option>
+                    <option value="allies">味方・仲間（allies）</option>
+                    <option value="generic">一般的な背景人物（background figures）</option>
+                  </select>
                 </label>
-                <label class="lbl">モブの配置・動き（英文、識別記号で指定）
+                <label class="lbl">👕 モブの特徴・衣装（タグ・自由入力）
+                  <textarea data-bind="mobs.appearance" placeholder="例: dark armor, hostile expression, dusty capes"></textarea>
+                </label>
+                <label class="lbl">🚶 モブの配置・動き（英文・自由入力）
                   <textarea data-bind="mobs.placement" placeholder="例: C surrounds A and B in a circle. C watches them from the background."></textarea>
                 </label>
-                <div id="mobExampleHint" class="hint">モブ集団には主要人物の次のアルファベットを割り当てます。位置関係は英文で指定できます。</div>
               </div>
             </div>
 
             <div class="section-card">
-              <div class="section-title">共通</div>
+              <h3 class="section-title">🧩 共通</h3>
               <div class="section-body">
-                <label class="lbl">構図
+                <label class="lbl">🧭 構図（タグ・自由入力）
                   <textarea data-bind="common.composition" placeholder="例: standing, facing each other, centered composition, ..."></textarea>
                 </label>
                 <div class="stack-sm">
-                  <label class="lbl" for="cameraPresets">カメラ指定プリセット（日本語 / 英語）</label>
+                  <div class="field-editor-titlebar">
+                    <label class="field-editor-title" for="cameraPresets">📷 カメラ指定プリセット（日本語 / 英語）</label>
+                    <button type="button" class="field-info-button" aria-expanded="false" aria-controls="cameraPresetGuide" aria-label="カメラプリセットの入力ガイドを開く" title="カメラプリセットの入力ガイド">ⓘ</button>
+                  </div>
+                  <div id="cameraPresetGuide" class="field-guide" hidden>
+                    <p>プルダウンから日本語・英語併記のカメラ指定を選ぶと、下のカメラ指定欄に英語タグが追記されます。何度でも選択できます。</p>
+                    <p><strong>記入例： </strong><code>from front, cowboy shot, wide-angle lens</code></p>
+                    <p>各入力欄の末尾にカンマを付ける必要はありません。出力時に自動補完します。</p>
+                  </div>
                   <select id="cameraPresets" aria-label="カメラプリセットを選択">
                     <option value="">選択するとタグを追加します（繰り返し選択可）</option>
                   </select>
-                  <label class="lbl">カメラ指定（自由入力・編集可）
-                    <textarea data-bind="common.camera" placeholder="例: from front, close-up, wide-angle lens,"></textarea>
+                  <label class="lbl">📷 カメラ指定（タグ・自由入力）
+                    <textarea data-bind="common.camera" placeholder="例: from front, close-up, wide-angle lens"></textarea>
                   </label>
-                  <div class="preset-help">プルダウンで選択したタグを、下の欄にカンマ区切りで追記します。同じタグを繰り返し追加することもできます。</div>
                 </div>
-                <label class="lbl">光・背景
+                <label class="lbl">🌄 光・背景（タグ・自由入力）
                   <textarea data-bind="common.lightBackground" placeholder="例: soft shadows, dramatic bright lighting, ..."></textarea>
                 </label>
-                <label class="lbl">人物同士の関係・位置（英語）
-                  <textarea data-bind="common.characterRelations" placeholder="例: A stands on the left. B stands on the right, facing A. C surrounds both."></textarea>
-                  <span class="hint">複数人物の特徴が混ざらないよう、各人物の位置関係を英文で指定することをおすすめします。</span>
+                <label class="lbl">🔗 全体の動き・人物の関係（英文・自由入力）
+                  <textarea data-bind="common.characterRelations" placeholder="例: A and B stand back to back. B protects A."></textarea>
+                  <span class="hint">主要人物同士の動作・位置関係と、場面全体の動きを英文で指定します。モブC自身の動きは「モブの配置・動き」に入力してください。</span>
                 </label>
-                <label class="lbl">共通の自然言語
+                <label class="lbl">✍️ 共通の自然言語（英文・自由入力）
                   <textarea data-bind="common.commonNaturalLanguage" placeholder="例: A slender young man stands quietly in a light stone interior..."></textarea>
                 </label>
-                <label class="lbl">LoRA
+                <label class="lbl">🧪 LoRA（自由入力）
                   <textarea data-bind="common.lora" placeholder="例: &lt;lora:example_style:0.5&gt;"></textarea>
                 </label>
               </div>
@@ -629,29 +885,29 @@ masterpiece, best quality,
           </div>
         </div>
 
-        <div class="panel">
+        <div class="panel negative-panel">
           <div class="hd">
-            <h2>ネガティブ入力</h2>
-            <span class="badge">コメント付き結合</span>
+            <h2>🚫 ネガティブ入力</h2>
+            <button id="resetNegativeBtn" class="reset-inline" type="button">ネガティブ入力をリセット</button>
           </div>
           <div class="bd" id="negativeArea">
             <div class="section-card">
-              <div class="section-title">ネガティブ</div>
+              <h3 class="section-title">🚫 ネガティブ</h3>
               <div class="section-body">
-                <label class="lbl">品質管理
+                <label class="lbl">🛡️ 品質管理（タグ・自由入力）
                   <textarea data-bind="negative.qualityIssues" placeholder="worst quality, low quality, blurry, ..."></textarea>
                   <span class="hint">新規作成時には基本タグが入力されています。必要に応じて削除・編集できます。</span>
                 </label>
-                <label class="lbl">望まない画風・質感
+                <label class="lbl">🎨 望まない画風・質感（タグ・自由入力）
                   <textarea data-bind="negative.unwantedRendering" placeholder="例: glossy skin, plastic skin, 3d, cg, ..."></textarea>
                 </label>
-                <label class="lbl">望まない外見・衣装
+                <label class="lbl">👕 望まない外見・衣装（タグ・自由入力）
                   <textarea data-bind="negative.unwantedAppearance" placeholder="例: fluffy hair, bulky body, heavy armor, ..."></textarea>
                 </label>
-                <label class="lbl">身体・顔の崩れ
+                <label class="lbl">🧬 身体・顔の崩れ（タグ・自由入力）
                   <textarea data-bind="negative.anatomyIssues" placeholder="例: bad anatomy, extra arms, deformed eyes, ..."></textarea>
                 </label>
-                <label class="lbl">その他ネガティブ
+                <label class="lbl">➖ その他ネガティブ（タグ・自由入力）
                   <textarea data-bind="negative.otherNegative" placeholder="例: 不要な小物、背景、特定要素を英語で指定"></textarea>
                 </label>
               </div>
@@ -659,10 +915,9 @@ masterpiece, best quality,
           </div>
         </div>
 
-        <div class="panel">
+        <div class="panel results-panel">
           <div class="hd">
-            <h2>統合結果</h2>
-            <span class="badge">そのままコピペ可</span>
+            <h2>📋 統合結果</h2>
           </div>
           <div class="bd">
             <div class="toolbar">
@@ -672,21 +927,34 @@ masterpiece, best quality,
                 <span id="allStats">統合: 0文字</span>
               </div>
               <div class="toolbar-right">
-                <button id="refreshBtn">今すぐ再生成</button>
+                <button id="refreshBtn" class="primary">今すぐ再生成</button>
               </div>
             </div>
 
+            <p class="copy-preview-help">各欄をクリックすると内容をコピーします。右上のコピーアイコンからもコピーできます。</p>
             <div class="preview">
-              <label class="lbl">ポジティブ統合
-                <textarea id="positivePreview" readonly></textarea>
-              </label>
-              <label class="lbl">ネガティブ統合
-                <textarea id="negativePreview" readonly></textarea>
-              </label>
+              <div class="copy-preview-field">
+                <div class="copy-preview-heading">
+                  <span class="copy-preview-title">ポジティブ統合</span>
+                  <button type="button" class="copy-preview-btn" data-copy-target="positivePreview" aria-label="ポジティブ統合をコピー" title="ポジティブ統合をコピー"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>コピー</span></button>
+                </div>
+                <textarea id="positivePreview" class="copyable-preview" readonly tabindex="0" aria-label="ポジティブ統合。クリックまたはEnterキーで全文コピー" title="クリックすると全文をコピーします" ></textarea>
+              </div>
+              <div class="copy-preview-field">
+                <div class="copy-preview-heading">
+                  <span class="copy-preview-title">ネガティブ統合</span>
+                  <button type="button" class="copy-preview-btn" data-copy-target="negativePreview" aria-label="ネガティブ統合をコピー" title="ネガティブ統合をコピー"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>コピー</span></button>
+                </div>
+                <textarea id="negativePreview" class="copyable-preview" readonly tabindex="0" aria-label="ネガティブ統合。クリックまたはEnterキーで全文コピー" title="クリックすると全文をコピーします" ></textarea>
+              </div>
             </div>
-            <label class="lbl">ポジ＋ネガ統合
-              <textarea id="allPreview" readonly style="min-height:280px;"></textarea>
-            </label>
+              <div class="copy-preview-field">
+                <div class="copy-preview-heading">
+                  <span class="copy-preview-title">ポジ＋ネガ統合</span>
+                  <button type="button" class="copy-preview-btn" data-copy-target="allPreview" aria-label="ポジ＋ネガ統合をコピー" title="ポジ＋ネガ統合をコピー"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>コピー</span></button>
+                </div>
+                <textarea id="allPreview" class="copyable-preview" readonly tabindex="0" aria-label="ポジ＋ネガ統合。クリックまたはEnterキーで全文コピー" title="クリックすると全文をコピーします" style="min-height:280px;"></textarea>
+              </div>
           </div>
         </div>
       </div>
@@ -706,7 +974,7 @@ masterpiece, best quality,
   <div class="slot-modal" id="allSlotsModal" aria-hidden="true">
     <div class="slot-modal-panel panel">
       <div class="hd">
-        <h2>保存スロット一覧</h2>
+        <h2>💾 保存スロット一覧</h2>
         <div class="row">
           <input id="slotSearchInput" type="text" placeholder="保存名で検索" style="max-width:220px;" />
           <button id="closeAllSlotsBtn" type="button">閉じる</button>
@@ -763,6 +1031,25 @@ masterpiece, best quality,
       ]]
     ];
 
+    const MOB_ROLE_NOUNS = {
+      monsters: { single: 'monster', plural: 'monsters', crowd: false, nonHuman: true },
+      generic: { single: 'background figure', plural: 'background figures', crowd: false },
+      enemies: { single: 'enemy', plural: 'enemies', crowd: false },
+      enemySoldiers: { single: 'enemy soldier', plural: 'enemy soldiers', crowd: false },
+      soldiers: { single: 'soldier', plural: 'soldiers', crowd: false },
+      guards: { single: 'guard', plural: 'guards', crowd: false },
+      spectators: { single: 'spectator', plural: 'spectators', crowd: true },
+      passersby: { single: 'passerby', plural: 'passersby', crowd: false },
+      adventurers: { single: 'adventurer', plural: 'adventurers', crowd: false },
+      bandits: { single: 'bandit', plural: 'bandits', crowd: false },
+      nobles: { single: 'noble', plural: 'nobles', crowd: false },
+      undead: { single: 'undead creature', plural: 'undead creatures', crowd: false, nonHuman: true },
+      animals: { single: 'animal', plural: 'animals', crowd: false, nonHuman: true },
+      allies: { single: 'ally', plural: 'allies', crowd: false },
+      crowd: { single: 'background person', plural: 'people', crowd: true },
+      custom: { single: 'background figure', plural: 'background figures', crowd: false }
+    };
+
     function makeEmptyPerson() {
       return {
         character: '',
@@ -790,6 +1077,7 @@ masterpiece, best quality,
           enabled: false,
           count: 0,
           kind: 'male',
+          role: 'generic',
           appearance: '',
           placement: ''
         },
@@ -814,15 +1102,14 @@ masterpiece, best quality,
       mobSection: document.getElementById('mobSection'),
       mobCount: document.getElementById('mobCount'),
       mobKind: document.getElementById('mobKind'),
-      mobExampleHint: document.getElementById('mobExampleHint'),
+      mobRole: document.getElementById('mobRole'),
       positivePreview: document.getElementById('positivePreview'),
       negativePreview: document.getElementById('negativePreview'),
       allPreview: document.getElementById('allPreview'),
-      copyAllBtn: document.getElementById('copyAllBtn'),
-      copyPositiveBtn: document.getElementById('copyPositiveBtn'),
-      copyNegativeBtn: document.getElementById('copyNegativeBtn'),
       refreshBtn: document.getElementById('refreshBtn'),
-      resetBtn: document.getElementById('resetBtn'),
+      resetPositiveBtn: document.getElementById('resetPositiveBtn'),
+      resetNegativeBtn: document.getElementById('resetNegativeBtn'),
+      clearInputsBtn: document.getElementById('clearInputsBtn'),
       autosaveStatus: document.getElementById('autosaveStatus'),
       slotName: document.getElementById('slotName'),
       saveSlotBtn: document.getElementById('saveSlotBtn'),
@@ -849,12 +1136,113 @@ masterpiece, best quality,
       negativeStats: document.getElementById('negativeStats'),
       allStats: document.getElementById('allStats'),
       exportTxtBtn: document.getElementById('exportTxtBtn'),
+      toggleAiTemplateBtn: document.getElementById('toggleAiTemplateBtn'),
+      copyAiTemplateBtn: document.getElementById('copyAiTemplateBtn'),
+      aiTemplateText: document.getElementById('aiTemplateText'),
       importText: document.getElementById('importText'),
       importFile: document.getElementById('importFile'),
       importScope: document.getElementById('importScope'),
       importBtn: document.getElementById('importBtn'),
       importStatus: document.getElementById('importStatus')
     };
+
+    function buildAiRequestTemplate() {
+      return `以下の条件で、Anima向けプロンプト管理ツールにそのまま読み込める形式へ整形してください。
+
+【依頼内容】
+- このあとに、作りたい画像の説明を文章で書く、または参考画像を添付します。
+- その内容をもとに、Anima向けのポジティブ／ネガティブプロンプトを作成してください。
+
+【出力ルール】
+1. 出力は日本語の説明や前置きを入れず、下の見出し形式だけで返してください。
+2. 見出しは # ===== ... ===== の形式をできるだけそのまま使ってください。
+3. タグ欄はカンマ区切りで出力してください。各欄の末尾のカンマはあってもなくても構いません。
+4. 自然言語欄は英文の短文で出力してください。
+5. 内容がない見出しは省略してください。
+6. 1人でも Character A / Face A / Hair A / Outfit A のように A 付きで書いてください。複数人なら B, C... を追加してください。
+7. モブ・群衆・観客・敵兵・モンスターなど背景の集団がいる場合は、Background group の見出しを使ってください。
+8. 余計な注釈・箇条書き・コードフェンス（\`\`\`）は付けないでください。
+
+【出力テンプレート】
+ポジ
+# ===== Quality / style =====
+[画風・品質タグ]
+
+# ===== Character A =====
+(A is [人物Aの基本タグ])
+
+# ===== Face A =====
+(A has [人物Aの顔・表情・目線タグ])
+
+# ===== Hair A =====
+(A has [人物Aの髪タグ])
+
+# ===== Outfit A =====
+(A wears [人物Aの衣装タグ])
+
+# ===== Natural language A =====
+[Aの自然言語短文]
+
+# ===== Character B =====
+(B is [人物Bの基本タグ])
+
+# ===== Face B =====
+(B has [人物Bの顔・表情・目線タグ])
+
+# ===== Hair B =====
+(B has [人物Bの髪タグ])
+
+# ===== Outfit B =====
+(B wears [人物Bの衣装タグ])
+
+# ===== Natural language B =====
+[Bの自然言語短文]
+
+# ===== Background group C =====
+(C is [群衆・モブ・敵・モンスターなどの集団タグ])
+
+# ===== Composition =====
+[構図・動き・主役の見せ方タグ]
+
+# ===== Camera / framing =====
+[カメラ・距離・角度タグ]
+
+# ===== Character relationships =====
+[人物同士の関係や位置関係の英文]
+
+# ===== Background group positions =====
+[Cの動き・配置の英文]
+
+# ===== Light / background =====
+[背景・光・雰囲気タグ]
+
+# ===== Common natural language =====
+[場面全体の自然言語短文]
+
+# ===== LoRA =====
+[必要ならLoRA]
+
+ネガ
+# ===== Quality issues =====
+[品質崩れ・ぼやけ等]
+
+# ===== Unwanted rendering =====
+[望まない画風・質感]
+
+# ===== Unwanted appearance / costume =====
+[望まない外見・衣装]
+
+# ===== Anatomy / face errors =====
+[顔や身体の崩れ]
+
+# ===== Other negative =====
+[その他ネガティブ]
+
+【重要】
+- もし1人だけなら B 以降は省略してください。
+- もしモブがいなければ Background group と Background group positions は省略してください。
+- もし参考画像を見て推定する場合も、画像の内容をこの形式へ整理して返してください。`;
+    }
 
     function setupCameraPresets() {
       for (const [groupName, items] of CAMERA_PRESETS) {
@@ -873,8 +1261,8 @@ masterpiece, best quality,
       if (!value) return;
       const box = document.querySelector('[data-bind="common.camera"]');
       const original = String(state.common.camera || '').trim();
-      const normalized = original.replace(/,?\s*$/, '');
-      const combined = normalized ? normalized + ', ' + value + ',' : value + ',';
+      const normalized = original.replace(/(?:,\s*)+$/, '').trimEnd();
+      const combined = normalized ? normalized + ', ' + value : value;
       state.common.camera = combined;
       box.value = combined;
       updatePreviews();
@@ -891,6 +1279,7 @@ masterpiece, best quality,
       s.mobs.enabled = Boolean(s.mobs.enabled);
       s.mobs.count = clampInt(s.mobs.count, 0, 5);
       if (!['male', 'female', 'mixed', 'other'].includes(s.mobs.kind)) s.mobs.kind = 'mixed';
+      if (!Object.hasOwn(MOB_ROLE_NOUNS, s.mobs.role)) s.mobs.role = 'generic';
       s.negative = Object.assign(makeDefaultState().negative, s.negative || {});
       s.people = Array.isArray(s.people) ? s.people : [];
       while (s.people.length < s.personCount) s.people.push(makeEmptyPerson());
@@ -1159,7 +1548,7 @@ masterpiece, best quality,
               <div class="slot-actions">
                 <button data-action="load" data-index="${index}" class="primary" type="button">読込</button>
                 <button data-action="delete" data-index="${index}" class="bad" type="button">削除</button>
-                <button data-action="renamefill" data-index="${index}" class="slot-fill-name" type="button">名前を入力欄へ</button>
+                <button data-action="renamefill" data-index="${index}" class="primary slot-fill-name" type="button">名前を入力欄へ</button>
               </div>
             </div>
           </div>
@@ -1310,23 +1699,23 @@ masterpiece, best quality,
       details.open = true;
       details.innerHTML = `
         <summary>
-          <span>${title}</span>
+          <span>👤 ${title}</span>
           <span class="badge">${multiple ? '主役' : '単体'}</span>
         </summary>
         <div class="person-body">
-          <label class="lbl">人物
+          <label class="lbl">🧍 人物（タグ・自由入力）
             <textarea data-bind="people.${index}.character" placeholder="例: 1male, solo, adult male, handsome young man, ..."></textarea>
           </label>
-          <label class="lbl">顔
-            <textarea data-bind="people.${index}.face" placeholder="例: soft wistful expression, slightly melancholic, ..."></textarea>
+          <label class="lbl">🙂 顔（タグ・自由入力）
+            <textarea data-bind="people.${index}.face" placeholder="例: gray-violet eyes, worried expression, looking at B"></textarea>
           </label>
-          <label class="lbl">髪
+          <label class="lbl">💇 髪（タグ・自由入力）
             <textarea data-bind="people.${index}.hair" placeholder="例: black hair, short layered hair, long bangs covering the right eye, ..."></textarea>
           </label>
-          <label class="lbl">衣装
+          <label class="lbl">👕 衣装（タグ・自由入力）
             <textarea data-bind="people.${index}.outfit" placeholder="例: fantasy scholar outfit, western fantasy court official attire, ..."></textarea>
           </label>
-          <label class="lbl">自然言語
+          <label class="lbl">✍️ 自然言語（英文・自由入力）
             <textarea data-bind="people.${index}.naturalLanguage" placeholder="例: A slender young man stands quietly in a stone corridor..."></textarea>
           </label>
         </div>
@@ -1363,28 +1752,135 @@ masterpiece, best quality,
       return label ? label + ((state.personCount > 1 || state.mobs.enabled) ? ' ' + String.fromCharCode(65 + Number(person[1])) : '') : '';
     }
 
+    // 項目別の入力ガイド。薄いプレースホルダーはそのまま残し、例は説明パネルにも保存する。
+    const FIELD_GUIDES = {
+      'common.qualityStyle': ['作品全体の品質や画風を指定します。人物固有の容姿とは分けて、カンマ区切りの英語タグで入力します。', 'masterpiece, best quality, painterly illustration, detailed fantasy art'],
+      'common.composition': ['人物の配置・画面全体の構図をタグ形式で指定します。個別のポーズは各人物の自然言語欄へ、カメラの方向はカメラ欄へ分けると管理しやすくなります。', 'centered composition, dynamic composition, standing, facing each other'],
+      'common.camera': ['カメラの向き、距離、レンズ表現を指定します。上のプリセットを何度でも選択でき、手入力で調整できます。', 'three-quarter view, from below, cowboy shot, wide-angle lens'],
+      'common.lightBackground': ['背景・場所・時間帯・光の方向や雰囲気を指定します。背景とライティングをまとめて指定する欄です。', 'ruined stone courtyard, dramatic lighting, warm rim light, soft shadows'],
+      'common.characterRelations': ['主役同士の関係、場面全体の動きや位置関係を英文で書きます。モブ自身の行動はモブ用の配置・動き欄に分けます。', 'A and B stand back to back. B protects A.'],
+      'common.commonNaturalLanguage': ['場面全体を短い英語の文章で説明します。人物同士の関係や雰囲気など、タグだけでは表現しにくい内容に向いています。', 'Two adventurers stand together in a ruined courtyard. A group of soldiers surrounds them.'],
+      'common.lora': ['LoRA関連の記述やトリガーワードを入力します。記述形式や重みは使用する生成UI・LoRAの説明に合わせてください。', '<lora:example_style:0.5>'],
+      'mobs.appearance': ['背景人物・モブの外見、衣装、武器などをカンマ区切りのタグで指定します。役割や人数は上のプルダウンで設定します。', 'dark armor, hostile expressions, dusty capes, carrying spears'],
+      'mobs.placement': ['この欄ではモブの配置と行動だけを英文で指定します。主役1人＋モブならA/B、主役2人＋群衆ならA/B/Cが自動で割り当てられます。', 'C surrounds A and B. C blocks the exit.'],
+      'negative.qualityIssues': ['画質低下や透かし・文字の混入を避ける基本タグです。新規作成時は初期値が入っていますが、削除・変更できます。', 'worst quality, low quality, blurry, jpeg artifacts, text, watermark'],
+      'negative.unwantedRendering': ['避けたい描画手法、色調、質感などを指定します。画風を希望する場合はポジティブにも望む表現を書きます。', '3d, cg, photorealistic, glossy skin, plastic skin'],
+      'negative.unwantedAppearance': ['避けたい体型・髪型・衣装・小物など、キャラクターの外見に関する条件をまとめて指定します。', 'bulky body, fluffy hair, modern clothing, heavy armor'],
+      'negative.anatomyIssues': ['身体や顔の形の崩れを避けるためのタグを指定します。実際に起きた問題を必要な分だけ追加するのがおすすめです。', 'bad anatomy, extra arms, extra fingers, deformed eyes'],
+      'negative.otherNegative': ['ほかの項目に含まれない、描画してほしくない要素を指定します。', 'unwanted objects, empty background'],
+      'person.character': ['年齢層、性別、身長・体格など、人物の基本設定をカンマ区切りで記入します。複数人ではA/Bなどの識別記号をツールが出力時に付けます。', 'adult male, slender, pale skin, elegant proportions'],
+      'person.face': ['顔立ち、表情、目の色、視線、顔の向きをまとめて指定します。身体のポーズは自然言語、撮影角度はカメラ指定へ。', 'gray-violet eyes, worried expression, looking at B, head tilt'],
+      'person.hair': ['髪色・長さ・髪型・前髪など、髪に関する特徴を指定します。', 'black hair, short layered hair, long bangs covering one eye'],
+      'person.outfit': ['服装、装飾、アクセサリー、武具などを指定します。', 'fantasy scholar outfit, white tunic, purple mantle, decorative trim'],
+      'person.naturalLanguage': ['この人物自身のポーズ、行動、表情の変化などを英文で指定します。複数人物ではA/Bなどの識別記号を使って書けます。', 'A raises his hand and looks toward B.']
+    };
+
+    const BASIC_GUIDES = {
+      personCount: ['描きたい主要人物の人数を1～6人で選びます。2人以上、またはモブを追加した場合は人物A・人物Bのように区別して出力します。', '例：主役2人なら「2」を選択'],
+      mobCount: ['群衆の人数を指定します。人数を厳密に決めない場合は「群衆（人数指定なし）」を選択します。', '例：敵兵が大勢いる場面なら「群衆（人数指定なし）」'],
+      mobKind: ['モブ集団の性別や種別を選びます。動物・モンスターなど性別指定が不要なら「人外・種別を指定しない」が適しています。', '例：男性兵士なら「男性」'],
+      mobRole: ['モブがどんな集団かを選びます。敵兵・観衆・モンスターなどを選択すると、該当する英語表現を自動で組み立てます。', '例：敵に取り囲まれた場面なら「敵兵」'],
+      cameraPresets: ['選択するとカメラ指定の入力欄に英語タグを追加します。同じ候補も何度でも選べます。', '例：俯瞰・上から（from above）'],
+      slotName: ['編集したプロンプトに名前を付けて保存スロットへ登録します。保存スロットにはサムネイルも設定できます。', '例：二人構図テスト / ファンタジー剣士'],
+      slotImageFile: ['スロットの一覧に表示するサムネイル画像を選びます。画像はブラウザ内で縮小して保存されます。', '例：生成画像のサムネイルを1枚登録']
+    };
+
+    let nextGuideId = 0;
+    function guideForPath(path) {
+      const personMatch = /^people\.\d+\.(\w+)$/.exec(path);
+      return FIELD_GUIDES[personMatch ? 'person.' + personMatch[1] : path] ||
+        ['この項目に関する内容を自由入力できます。', ''];
+    }
+    function makeGuideButton(guideId, titleText) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'field-info-button';
+      button.textContent = 'ⓘ';
+      button.title = titleText + 'の入力ガイド';
+      button.setAttribute('aria-label', titleText + 'の入力ガイドを開く');
+      button.setAttribute('aria-controls', guideId);
+      button.setAttribute('aria-expanded', 'false');
+      return button;
+    }
+    function makeGuide(guideId, guide, notes = []) {
+      const panel = document.createElement('div');
+      panel.className = 'field-guide';
+      panel.id = guideId;
+      panel.hidden = true;
+      const explanation = document.createElement('p');
+      explanation.textContent = guide[0];
+      panel.appendChild(explanation);
+      if (guide[1]) {
+        const example = document.createElement('p');
+        const title = document.createElement('strong');
+        title.textContent = '記入例： ';
+        const code = document.createElement('code');
+        code.textContent = guide[1];
+        example.append(title, code);
+        panel.appendChild(example);
+      }
+      for (const note of notes.filter(Boolean)) {
+        const p = document.createElement('p');
+        p.className = 'field-guide-extra';
+        p.textContent = note;
+        panel.appendChild(p);
+      }
+      return panel;
+    }
+    function upgradeInputGuide(node, titleText, guide, notes = [], headingText = '') {
+      const originalLabel = node.closest('label.lbl');
+      if (!originalLabel) return;
+      const editor = document.createElement('div');
+      editor.className = 'field-editor' + (headingText ? '' : ' field-editor--basic');
+      if (originalLabel.style.flex) editor.style.flex = originalLabel.style.flex;
+      const titlebar = document.createElement('div');
+      titlebar.className = 'field-editor-titlebar';
+      const id = node.id || ('prompt-input-' + ++nextGuideId);
+      node.id = id;
+      const textLabel = document.createElement('label');
+      textLabel.className = 'field-editor-title';
+      textLabel.htmlFor = id;
+      textLabel.textContent = titleText;
+      const guideId = 'field-guide-' + ++nextGuideId;
+      titlebar.append(textLabel, makeGuideButton(guideId, titleText));
+      if (headingText) {
+        const code = document.createElement('code');
+        code.className = 'field-editor-code';
+        code.textContent = headingText;
+        titlebar.appendChild(code);
+      }
+      // すでに画面下に表示されていた注記は、入力ガイド内にまとめる。
+      originalLabel.querySelectorAll(':scope > .hint').forEach(hint => {
+        notes.push(hint.textContent.trim());
+      });
+      originalLabel.replaceWith(editor);
+      editor.append(titlebar, makeGuide(guideId, guide, notes), node);
+      return editor;
+    }
+    function setupBasicGuides() {
+      for (const [id, guide] of Object.entries(BASIC_GUIDES)) {
+        const node = document.getElementById(id);
+        if (!node || !node.closest('label.lbl')) continue;
+        const label = node.closest('label.lbl');
+        const title = label.firstChild?.nodeType === Node.TEXT_NODE ? label.firstChild.textContent.trim() : '';
+        upgradeInputGuide(node, title || '入力項目', guide);
+      }
+    }
+
     function bindStaticInputs() {
       document.querySelectorAll('[data-bind]').forEach(node => {
         const path = node.dataset.bind;
         const currentValue = getByPath(state, path) ?? '';
         if (node.value !== currentValue) node.value = currentValue;
-        const label = node.closest('label.lbl');
-        if (!label) return;
-        let heading = label.querySelector(':scope > .field-label');
-        if (!heading) {
-          const firstText = label.firstChild;
-          const japaneseName = firstText?.nodeType === Node.TEXT_NODE ? firstText.textContent.trim() : '';
-          if (firstText?.nodeType === Node.TEXT_NODE) firstText.textContent = '';
-          heading = document.createElement('span');
-          heading.className = 'field-label';
-          const title = document.createElement('span');
-          title.textContent = japaneseName;
-          const code = document.createElement('code');
-          code.className = 'field-code';
-          heading.append(title, code);
-          label.insertBefore(heading, node);
+        if (!node.closest('.field-editor')) {
+          const label = node.closest('label.lbl');
+          if (!label) return;
+          const titleText = label.firstChild?.nodeType === Node.TEXT_NODE
+            ? label.firstChild.textContent.trim() : '';
+          upgradeInputGuide(node, titleText, guideForPath(path), [], '# ===== ' + getHeadingForField(path) + ' =====');
         }
-        heading.querySelector('.field-code').textContent = '# ===== ' + getHeadingForField(path) + ' =====';
+        const code = node.closest('.field-editor')?.querySelector('.field-editor-code');
+        if (code) code.textContent = '# ===== ' + getHeadingForField(path) + ' =====';
       });
     }
 
@@ -1422,6 +1918,14 @@ masterpiece, best quality,
       let male = subjects.filter(p => guessGender(p) === 'male').length;
       let female = subjects.filter(p => guessGender(p) === 'female').length;
       const mobs = state.mobs.enabled;
+      const nonHumanGroup = mobs && Boolean(MOB_ROLE_NOUNS[state.mobs.role]?.nonHuman);
+      if (nonHumanGroup) {
+        // 動物やモンスターは人数タグに含めず、主要人物の人数のみを示す。
+        if (male + female !== state.personCount) return 'multiple people';
+        if (male === state.personCount) return state.personCount === 1 ? '1boy' : `${male}boys`;
+        if (female === state.personCount) return state.personCount === 1 ? '1girl' : `${female}girls`;
+        return [male ? `${male}boy${male === 1 ? '' : 's'}` : '', female ? `${female}girl${female === 1 ? '' : 's'}` : ''].filter(Boolean).join(', ');
+      }
       if (mobs && state.mobs.count === 0) {
         // 不定数の群衆がいるのに「2boys」と書くと矛盾する。
         return state.mobs.kind === 'male' && female === 0 && male === state.personCount ? 'multiple boys'
@@ -1436,19 +1940,60 @@ masterpiece, best quality,
       return [male ? `${male}boy${male === 1 ? '' : 's'}` : '', female ? `${female}girl${female === 1 ? '' : 's'}` : ''].filter(Boolean).join(', ');
     }
 
+    // 種類と性別を別々に指定。敵兵を選択してもspectatorsにはならない。
+    function mobDescriptionFor(count, kind, role) {
+      const noun = MOB_ROLE_NOUNS[role] || MOB_ROLE_NOUNS.generic;
+      const gender = noun.nonHuman ? '' : kind === 'male' ? 'adult male ' : kind === 'female' ? 'adult female ' : '';
+      if (count === 0) return `${noun.crowd ? 'a crowd of' : 'a group of'} ${gender}${noun.plural}`;
+      if (count === 1) {
+        const text = `${gender}${noun.single}`;
+        return `${/^[aeiou]/i.test(text) ? 'an' : 'a'} ${text}`;
+      }
+      return `a group of ${count} ${gender}${noun.plural}`;
+    }
+
     function mobDescription() {
-      const gender = {
-        male: {single:'an adult man', group:'adult men', crowd:'adult male spectators'},
-        female: {single:'an adult woman', group:'adult women', crowd:'adult female spectators'},
-        mixed: {single:'a background figure', group:'background people', crowd:'spectators'},
-        other: {single:'a background figure', group:'background figures', crowd:'background figures'}
-      }[state.mobs.kind] || {single:'a background figure',group:'background figures',crowd:'background figures'};
-      if (state.mobs.count === 0) return `a crowd of ${gender.crowd}`;
-      if (state.mobs.count === 1) return `${gender.single}, background character`;
-      return `a group of ${state.mobs.count} ${gender.group}, background characters`;
+      // 自由指定のときは固定の職業・役割タグを付けず、汎用の集団名だけを使います。
+      return mobDescriptionFor(state.mobs.count, state.mobs.kind, state.mobs.role);
+    }
+
+    // TXTの読み戻し時に自動生成したグループの説明と手入力タグを切り分ける。
+    function parseMobDescription(body) {
+      const matches = [];
+      for (const count of [0, 1, 2, 3, 4, 5]) {
+        for (const kind of ['male', 'female', 'mixed', 'other']) {
+          for (const role of Object.keys(MOB_ROLE_NOUNS)) {
+            const phrase = mobDescriptionFor(count, kind, role);
+            if (body === phrase || body.startsWith(phrase + ', ')) {
+              matches.push({ count, kind, role, phrase });
+            }
+          }
+        }
+      }
+      matches.sort((a, b) => b.phrase.length - a.phrase.length);
+      const result = matches[0];
+      if (!result) return null;
+      return {
+        count: result.count,
+        kind: result.kind,
+        role: result.role,
+        appearance: body.slice(result.phrase.length).replace(/^[,\s]+/, '')
+      };
+    }
+
+    // 人数・モブのプルダウン等の設定だけでは文章を作らない。
+    // ポジティブの自由入力欄に実際の記述がある場合に限って出力する。
+    function hasPositiveTextInput() {
+      const hasText = value => typeof value === 'string' && value.trim().length > 0;
+      if (Object.values(state.common).some(hasText)) return true;
+      if (state.people.slice(0, state.personCount).some(person =>
+        Object.values(person).some(hasText))) return true;
+      if (state.mobs.enabled && (hasText(state.mobs.appearance) || hasText(state.mobs.placement))) return true;
+      return false;
     }
 
     function buildPositiveOutput() {
+      if (!hasPositiveTextInput()) return '';
       const labeled = state.personCount > 1 || state.mobs.enabled;
       const blocks = [];
       pushBlock(blocks, 'Quality / style', state.common.qualityStyle);
@@ -1463,13 +2008,13 @@ masterpiece, best quality,
           pushBlock(blocks, 'Face' + suffix, labelPersonValue(letter, 'has', p.face));
           pushBlock(blocks, 'Hair' + suffix, labelPersonValue(letter, 'has', p.hair));
           pushBlock(blocks, 'Outfit' + suffix, labelPersonValue(letter, 'wears', p.outfit));
-          pushBlock(blocks, 'Natural language' + suffix, p.naturalLanguage);
+          pushBlock(blocks, 'Natural language' + suffix, p.naturalLanguage, true);
         } else {
           pushBlock(blocks, 'Character', p.character);
           pushBlock(blocks, 'Face', p.face);
           pushBlock(blocks, 'Hair', p.hair);
           pushBlock(blocks, 'Outfit', p.outfit);
-          pushBlock(blocks, 'Natural language', p.naturalLanguage);
+          pushBlock(blocks, 'Natural language', p.naturalLanguage, true);
         }
       }
 
@@ -1483,10 +2028,10 @@ masterpiece, best quality,
 
       pushBlock(blocks, 'Composition', labeled ? removeSoloCountTags(state.common.composition) : state.common.composition);
       pushBlock(blocks, 'Camera / framing', state.common.camera);
-      pushBlock(blocks, 'Character relationships', state.common.characterRelations);
-      if (state.mobs.enabled) pushBlock(blocks, 'Background group positions', state.mobs.placement);
+      pushBlock(blocks, 'Character relationships', state.common.characterRelations, true);
+      if (state.mobs.enabled) pushBlock(blocks, 'Background group positions', state.mobs.placement, true);
       pushBlock(blocks, 'Light / background', state.common.lightBackground);
-      pushBlock(blocks, 'Common natural language', state.common.commonNaturalLanguage);
+      pushBlock(blocks, 'Common natural language', state.common.commonNaturalLanguage, true);
       pushBlock(blocks, 'LoRA', state.common.lora);
       return blocks.join('\n\n').trim();
     }
@@ -1501,10 +2046,19 @@ masterpiece, best quality,
       return blocks.join('\n\n').trim();
     }
 
-    function pushBlock(list, title, content) {
-      const trimmed = (content || '').trim();
+    // 各欄の末尾にカンマは不要。タグ形式のブロックだけ、
+    // 出力時に区切りのカンマをちょうど1個付ける（人物の閉じ括弧の外側）。
+    // 英文の自然言語欄はピリオド等を含め、入力した文章のまま出力する。
+    function trimFinalCommas(value) {
+      return String(value || '').trim().replace(/(?:,\s*)+$/, '').trimEnd();
+    }
+
+    function pushBlock(list, title, content, prose = false) {
+      const trimmed = String(content || '').trim();
       if (!trimmed) return;
-      list.push(`# ===== ${title} =====\n${trimmed}`);
+      const body = prose ? trimmed : trimFinalCommas(trimmed);
+      if (!body) return;
+      list.push(`# ===== ${title} =====\n${prose ? body : body + ','}`);
     }
 
     function buildAllOutput() {
@@ -1599,26 +2153,17 @@ masterpiece, best quality,
           if (scope === 'negative') continue;
           result.mobs.enabled = true;
           if (bgGroup) {
-            const match = block.content.match(/^\([A-G] is (.*)\)$/s);
-            const body = match ? match[1] : block.content;
-            const crowdMatch = body.match(/^a crowd of (adult male spectators|adult female spectators|spectators|background figures)(?:,\s*)?/i);
-            const countMatch = body.match(/^a group of (\d+) (adult men|adult women|background people|background figures),?\s*(?:background characters,?\s*)?/i);
-            const singleMatch = body.match(/^(an adult man|an adult woman|a background figure),?\s*(?:background character,?\s*)?/i);
-            let remainder = body;
-            if (crowdMatch) {
-              result.mobs.count = 0;
-              result.mobs.kind = crowdMatch[1].startsWith('adult male') ? 'male' : crowdMatch[1].startsWith('adult female') ? 'female' : crowdMatch[1] === 'spectators' ? 'mixed' : 'other';
-              remainder = body.slice(crowdMatch[0].length);
-            } else if (countMatch) {
-              result.mobs.count = clampInt(countMatch[1], 1, 5);
-              result.mobs.kind = countMatch[2] === 'adult men' ? 'male' : countMatch[2] === 'adult women' ? 'female' : countMatch[2] === 'background people' ? 'mixed' : 'other';
-              remainder = body.slice(countMatch[0].length);
-            } else if (singleMatch) {
-              result.mobs.count = 1;
-              result.mobs.kind = singleMatch[1] === 'an adult man' ? 'male' : singleMatch[1] === 'an adult woman' ? 'female' : 'other';
-              remainder = body.slice(singleMatch[0].length);
+            const match = trimFinalCommas(block.content).match(/^\([A-G] is (.*)\)$/s);
+            const body = match ? match[1] : trimFinalCommas(block.content);
+            const parsedMob = parseMobDescription(body);
+            if (parsedMob) {
+              result.mobs.count = parsedMob.count;
+              result.mobs.kind = parsedMob.kind;
+              result.mobs.role = parsedMob.role;
+              result.mobs.appearance = parsedMob.appearance;
+            } else {
+              result.mobs.appearance = body;
             }
-            result.mobs.appearance = remainder.replace(/^[,\s]+/, '');
           } else {
             result.mobs.placement = block.content;
           }
@@ -1638,6 +2183,9 @@ masterpiece, best quality,
         const path = dest.kind === 'person' ? `people.${dest.index}.${dest.field}` : `${dest.kind}.${dest.field}`;
         const existing = getByPath(result, path) || '';
         let content = block.content;
+        const isProse = (dest.kind === 'person' && dest.field === 'naturalLanguage') ||
+          (dest.kind === 'common' && ['characterRelations', 'commonNaturalLanguage'].includes(dest.field));
+        if (!isProse) content = trimFinalCommas(content);
         if (dest.kind === 'person' && dest.field !== 'naturalLanguage') {
           content = content.replace(/^\([A-F] (?:is|has|wears) ([\s\S]*?)\)$/, '$1');
         }
@@ -1695,6 +2243,18 @@ masterpiece, best quality,
       showToast('コメント見出しを読み取り、入力欄に反映しました。');
     }
 
+    function syncAiTemplateText() {
+      if (!el.aiTemplateText) return;
+      el.aiTemplateText.value = buildAiRequestTemplate();
+    }
+
+    function toggleAiTemplate() {
+      const hidden = el.aiTemplateText.hidden;
+      el.aiTemplateText.hidden = !hidden;
+      el.toggleAiTemplateBtn.textContent = hidden ? '非表示' : '表示';
+      if (hidden) syncAiTemplateText();
+    }
+
     function updatePreviews() {
       const pos = buildPositiveOutput();
       const neg = buildNegativeOutput();
@@ -1708,22 +2268,29 @@ masterpiece, best quality,
     }
 
     async function copyText(text, label) {
+      if (!text.trim()) { showToast('コピーする内容がありません。'); return; }
       try {
+        if (!navigator.clipboard?.writeText) throw new Error('clipboard API unavailable');
         await navigator.clipboard.writeText(text);
         showToast(label + 'をコピーしました。');
       } catch (e) {
-        fallbackCopy(text);
-        showToast(label + 'をコピーしました。');
+        if (fallbackCopy(text)) showToast(label + 'をコピーしました。');
+        else showToast('コピーできませんでした。ブラウザの権限をご確認ください。');
       }
     }
 
     function fallbackCopy(text) {
       const tmp = document.createElement('textarea');
       tmp.value = text;
+      tmp.style.position = 'fixed';
+      tmp.style.opacity = '0';
       document.body.appendChild(tmp);
+      tmp.focus();
       tmp.select();
-      document.execCommand('copy');
+      let result = false;
+      try { result = document.execCommand('copy'); } catch (_) { result = false; }
       tmp.remove();
+      return result;
     }
 
     let saveTimer = null;
@@ -1754,14 +2321,41 @@ masterpiece, best quality,
       scheduleSave();
     });
 
-    function resetCurrent() {
-      if (!confirm('現在の入力内容を初期化しますか？\n保存スロットは削除されません。')) return;
-      state = makeDefaultState();
-      setThumbnailDraft(null, false);
-      el.slotName.value = '';
+    function resetPositiveInputs() {
+      if (!confirm('ポジティブ入力を初期化しますか？\nネガティブ入力と保存スロットは変更されません。')) return;
+      const defaults = makeDefaultState();
+      state.personCount = defaults.personCount;
+      state.people = defaults.people;
+      state.common = defaults.common;
+      state.mobs = defaults.mobs;
+      el.cameraPresets.value = '';
       renderAll();
       scheduleSave();
-      showToast('現在の入力を初期化しました。');
+      showToast('ポジティブ入力を初期化しました。');
+    }
+
+    function resetNegativeInputs() {
+      if (!confirm('ネガティブ入力を初期値に戻しますか？\nポジティブ入力と保存スロットは変更されません。')) return;
+      state.negative = makeDefaultState().negative;
+      renderAll();
+      scheduleSave();
+      showToast('ネガティブ入力を初期値に戻しました。');
+    }
+
+    function clearAllInputs() {
+      if (!confirm('すべての入力内容を消去しますか？\n保存済みのスロットは削除されません。')) return;
+      state = makeDefaultState();
+      // 「初期化」とは異なり、ネガティブの品質管理の初期タグも消去します。
+      state.negative.qualityIssues = '';
+      setThumbnailDraft(null, false);
+      el.slotName.value = '';
+      el.slotImageFile.value = '';
+      el.importText.value = '';
+      el.importStatus.textContent = '';
+      el.cameraPresets.value = '';
+      renderAll();
+      scheduleSave();
+      showToast('編集中の入力内容をすべて消去しました。保存スロットは残っています。');
     }
 
     function renderAll() {
@@ -1771,15 +2365,22 @@ masterpiece, best quality,
       el.mobSection.style.display = state.mobs.enabled ? '' : 'none';
       el.mobCount.value = state.mobs.count;
       el.mobKind.value = state.mobs.kind;
+      el.mobRole.value = state.mobs.role;
       const mainLetters = Array.from({length:state.personCount}, (_, i) => String.fromCharCode(65 + i));
       const mobLetter = String.fromCharCode(65 + state.personCount);
       const mainText = mainLetters.length === 1 ? mainLetters[0]
         : mainLetters.slice(0, -1).join(', ') + ' and ' + mainLetters[mainLetters.length - 1];
       const mobPlacement = document.querySelector('[data-bind="mobs.placement"]');
-      mobPlacement.placeholder = `例: ${mobLetter} surrounds ${mainText}. ${mobLetter} watches from the background.`;
-      el.mobExampleHint.textContent = `主役${mainText}、モブ集団${mobLetter}として出力。モブの位置や動作はこの欄に英文で追記できます。`;
+      mobPlacement.placeholder = `例: ${mobLetter} surrounds ${mainText}. ${mobLetter} blocks the exit.`;
       renderPeople();
       bindStaticInputs();
+      const mobEditor = mobPlacement.closest('.field-editor');
+      const mobGuide = mobEditor?.querySelector('.field-guide');
+      if (mobGuide) {
+        mobGuide.querySelector('p').textContent = `主役${mainText}、モブ集団${mobLetter}として出力します。この欄ではモブ${mobLetter}の動作と配置だけを英文で指定します。`;
+        const example = mobGuide.querySelector('code');
+        if (example) example.textContent = `${mobLetter} surrounds ${mainText}. ${mobLetter} blocks the exit.`;
+      }
       updatePreviews();
       renderSlots();
       renderThumbnailDraft();
@@ -1806,12 +2407,23 @@ masterpiece, best quality,
       updatePreviews();
       scheduleSave();
     });
+    el.mobRole.addEventListener('change', () => {
+      state.mobs.role = el.mobRole.value;
+      updatePreviews();
+      scheduleSave();
+    });
 
     el.exportTxtBtn.addEventListener('click', () => {
       const text = buildAllOutput();
       if (!text) { showToast('書き出すプロンプトがありません。'); return; }
       downloadText('anima_prompt_' + new Date().toISOString().slice(0,10) + '.txt', text);
       showToast('コメント付きTXTを書き出しました。');
+    });
+    syncAiTemplateText();
+    el.toggleAiTemplateBtn.addEventListener('click', toggleAiTemplate);
+    el.copyAiTemplateBtn.addEventListener('click', () => {
+      syncAiTemplateText();
+      copyText(el.aiTemplateText.value, 'AI依頼用テンプレート');
     });
     el.importBtn.addEventListener('click', importFromText);
     el.importFile.addEventListener('change', async () => {
@@ -1825,11 +2437,35 @@ masterpiece, best quality,
       }
       el.importFile.value = '';
     });
-    el.copyAllBtn.addEventListener('click', () => copyText(buildAllOutput(), '統合テキスト'));
-    el.copyPositiveBtn.addEventListener('click', () => copyText(buildPositiveOutput(), 'ポジティブ'));
-    el.copyNegativeBtn.addEventListener('click', () => copyText(buildNegativeOutput(), 'ネガティブ'));
+    document.querySelectorAll('.copy-preview-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const target = document.getElementById(button.dataset.copyTarget);
+        if (target) copyText(target.value, target.id === 'positivePreview' ? 'ポジティブ' : target.id === 'negativePreview' ? 'ネガティブ' : 'ポジ＋ネガ統合');
+      });
+    });
+    document.querySelectorAll('textarea.copyable-preview').forEach(area => {
+      const copyArea = () => copyText(area.value, area.id === 'positivePreview' ? 'ポジティブ' : area.id === 'negativePreview' ? 'ネガティブ' : 'ポジ＋ネガ統合');
+      area.addEventListener('click', copyArea);
+      area.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          copyArea();
+        }
+      });
+    });
     el.refreshBtn.addEventListener('click', updatePreviews);
-    el.resetBtn.addEventListener('click', resetCurrent);
+    el.resetPositiveBtn.addEventListener('click', resetPositiveInputs);
+    el.resetNegativeBtn.addEventListener('click', resetNegativeInputs);
+    el.clearInputsBtn.addEventListener('click', clearAllInputs);
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest('.field-info-button');
+      if (!button) return;
+      const panel = document.getElementById(button.getAttribute('aria-controls'));
+      if (!panel) return;
+      panel.hidden = !panel.hidden;
+      button.setAttribute('aria-expanded', String(!panel.hidden));
+      button.setAttribute('aria-label', button.title + (panel.hidden ? 'を開く' : 'を閉じる'));
+    });
     el.slotImageFile.addEventListener('change', async () => {
       const file = el.slotImageFile.files?.[0];
       if (!file) return;
@@ -1871,6 +2507,7 @@ masterpiece, best quality,
     });
     el.slotSearchInput.addEventListener('input', renderAllSlotsModal);
     setupCameraPresets();
+    setupBasicGuides();
     el.cameraPresets.addEventListener('change', () => appendCameraPreset(el.cameraPresets.value));
 
 
