@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animaプロンプト管理ツール</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --panel-2: #1f2430;
+      --line: #31384a;
+      --text: #e8ecf3;
+      --sub: #aeb7c7;
+      --accent: #8e7dff;
+      --accent-2: #5cc8ff;
+      --good: #2db983;
+      --warn: #e0a100;
+      --bad: #d85c5c;
+      --shadow: 0 8px 24px rgba(0,0,0,.25);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #0c0e12 0%, #11151d 100%);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.5;
+    }
+
+    .wrap {
+      width: min(1500px, calc(100% - 24px));
+      margin: 18px auto 40px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(142,125,255,.18), rgba(92,200,255,.12));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--sub);
+      font-size: .95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: 1fr; }
+      .right { order: 1; }
+      .left { order: 2; }
+    }
+
+    .left, .right {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      background: rgba(23,26,33,.95);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel .hd {
+      padding: 14px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel .hd h2 {
+      font-size: 1rem;
+    }
+
+    .panel .bd {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .stack { display: grid; gap: 12px; }
+    .stack-sm { display: grid; gap: 8px; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .row > * { min-width: 0; }
+
+    label.lbl {
+      display: grid;
+      gap: 6px;
+      font-size: .92rem;
+      color: var(--sub);
+    }
+
+    .hint {
+      color: var(--sub);
+      font-size: .83rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font: inherit;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    input[type="number"] { max-width: 120px; }
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+      font-family: var(--mono);
+      line-height: 1.45;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 3px rgba(92,200,255,.12);
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, #292f3d, #222836);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font: inherit;
+      cursor: pointer;
+      transition: transform .06s ease, opacity .15s ease, background .15s ease, border-color .15s ease;
+    }
+
+    button:hover { border-color: rgba(255,255,255,.18); }
+    button:active { transform: translateY(1px); }
+    button.primary {
+      background: linear-gradient(180deg, #7567ff, #5f53d6);
+      border-color: rgba(255,255,255,.12);
+    }
+    button.good {
+      background: linear-gradient(180deg, #2eaf7f, #248d67);
+    }
+    button.warn {
+      background: linear-gradient(180deg, #b8860b, #8d6807);
+    }
+    button.bad {
+      background: linear-gradient(180deg, #b54f4f, #8f3f3f);
+    }
+    button.ghost {
+      background: transparent;
+    }
+
+    .section-card {
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255,255,255,.02);
+    }
+
+    .section-title {
+      padding: 10px 12px;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      font-weight: 600;
+      font-size: .95rem;
+    }
+
+    .section-body {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    details.person {
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255,255,255,.02);
+    }
+    details.person[open] summary { border-bottom: 1px solid rgba(255,255,255,.08); }
+    details.person summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      background: rgba(255,255,255,.03);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      user-select: none;
+    }
+    details.person summary::-webkit-details-marker { display: none; }
+    .person-body { padding: 14px 16px; display: grid; gap: 12px; }
+
+    .badge {
+      font-size: .78rem;
+      color: #d8def0;
+      background: rgba(142,125,255,.18);
+      border: 1px solid rgba(142,125,255,.28);
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .slot-list { display: grid; gap: 10px; }
+    .slot-thumb {
+      display: block; width: 108px; height: 108px;
+      object-fit: contain; background: #101319;
+      border: 1px solid var(--line); border-radius: 9px; flex: 0 0 108px;
+    }
+    .slot-main {
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .slot-side {
+      display: grid; gap: 8px; flex: 1 1 auto; min-width: 0;
+    }
+    .slot-actions {
+      display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px;
+    }
+    .slot-actions button { width: 100%; min-width: 0; padding: 10px 5px; }
+    .slot-actions .slot-fill-name { grid-column: 1 / -1; font-size: .86rem; white-space: nowrap; }
+    .slot-topline {
+      display: flex; justify-content: space-between; gap: 8px; align-items: center;
+    }
+    .slot-preview-header {
+      display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap;
+    }
+    .slot-section-title {
+      font-size: .86rem; color: var(--sub); font-weight: 600;
+      margin-top: 4px;
+    }
+    .slot-note {
+      font-size: .82rem; color: var(--sub);
+    }
+    .star-btn {
+      flex: 0 0 40px; width: 40px; height: 40px;
+      padding: 0; display: inline-flex; align-items: center;
+      justify-content: center; font-size: 1.25rem; line-height: 1;
+    }
+    .star-btn.active {
+      background: linear-gradient(180deg, #8d7b0b, #705f08);
+      border-color: rgba(255,255,255,.16);
+      color: #fff2a8;
+    }
+    .slot-summary-box {
+      display: flex; gap: 12px; flex-wrap: wrap; color: var(--sub); font-size: .83rem;
+    }
+    .storage-error {
+      color: #ffb7b7; font-size: .86rem;
+      border: 1px solid rgba(216,92,92,.4); background: rgba(216,92,92,.1);
+      border-radius: 10px; padding: 8px 10px; display:none;
+    }
+    .storage-error.show { display:block; }
+    .slot-modal {
+      position: fixed; inset: 0; z-index: 9998; display: none;
+      background: rgba(5,7,11,.68); padding: 16px;
+    }
+    .slot-modal.show { display: block; }
+    .slot-modal-panel {
+      width: min(1100px, 100%); max-height: calc(100vh - 32px); overflow: auto;
+      margin: 0 auto; background: var(--panel); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px; box-shadow: var(--shadow);
+    }
+    .slot-modal-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;
+    }
+    .image-picker { display: grid; gap: 8px; }
+    .image-draft-preview {
+      display: none; width: 142px; height: 108px; object-fit: contain;
+      border-radius: 9px; background: #101319; border: 1px solid var(--line);
+    }
+    .image-draft-preview.visible { display: block; }
+    .field-label {
+      display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+      color: var(--sub); font-size: .92rem;
+    }
+    .field-code {
+      font: .77rem var(--mono); color: #aaa4f0; opacity: .95;
+      overflow-wrap: anywhere;
+    }
+
+    .slot-item {
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      display: grid;
+      gap: 8px;
+    }
+    .slot-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .slot-name {
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .slot-time {
+      font-size: .8rem;
+      color: var(--sub);
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 1100px) {
+      .preview { grid-template-columns: 1fr; }
+    }
+
+    .preview textarea {
+      min-height: 360px;
+    }
+
+    @media (max-width: 560px) {
+      .slot-main { flex-direction: row; }
+      .slot-thumb { width: 88px; height: 88px; flex-basis: 88px; }
+      .slot-actions { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+
+    .kpi {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      color: var(--sub); font-size: .83rem;
+    }
+
+    .status {
+      font-size: .84rem;
+      color: var(--sub);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: rgba(17,21,29,.96);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all .18s ease;
+      pointer-events: none;
+      z-index: 9999;
+      max-width: min(92vw, 420px);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .muted { color: var(--sub); }
+    .small { font-size: .82rem; }
+
+    .site-footer {
+      margin: 22px auto 0;
+      padding: 18px 14px 8px;
+      border-top: 1px solid var(--line);
+      color: var(--sub);
+      text-align: center;
+      font-size: .81rem;
+      line-height: 1.7;
+    }
+    .site-footer p { margin: 0 0 5px; }
+    .site-footer a { color: var(--sub); text-underline-offset: 3px; }
+    .site-footer a:hover { color: var(--text); }
+    .site-footer .footer-section { max-width: 950px; margin: 0 auto 12px; }
+    .site-footer .footer-heading { font-weight: 650; color: var(--text); margin-bottom: 5px; }
+    .preset-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: center; }
+    .preset-row select { min-width: 0; }
+    .preset-row button { white-space: nowrap; }
+    .preset-help { font-size: .82rem; color: var(--sub); }
+    @media (max-width: 500px) { .preset-row { grid-template-columns: minmax(0,1fr); } }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Animaプロンプト管理ツール</h1>
+      <p>項目別入力・カメラプリセット・A/B/C人物識別・画像付き保存スロット対応の単一HTML版。</p>
+    </div>
+
+    <div class="grid">
+      <div class="left">
+        <div class="panel">
+          <div class="hd">
+            <h2>基本設定</h2>
+            <span class="badge">自動保存対応</span>
+          </div>
+          <div class="bd">
+            <div class="row">
+              <label class="lbl" style="flex:0 0 150px;">
+                人数
+                <input id="personCount" type="number" min="1" max="6" step="1" />
+              </label>
+              <div class="hint" style="flex:1 1 320px;">主要人物の人数（最大6人）を設定します。2人以上の場合、出力ではA・B…の識別記号を付けます。</div>
+            </div>
+
+            <div class="row" style="align-items:center;">
+              <label class="lbl" style="display:flex;align-items:center;gap:9px;">
+                <input id="enableMobs" type="checkbox" style="width:auto;" />
+                モブ・観衆（集団）を追加
+              </label>
+              <span class="hint">主要人物1人＋モブはA/B、主要人物2人＋群衆はA/B/Cで出力します。</span>
+            </div>
+            <div class="row">
+              <button id="copyAllBtn" class="primary">統合をコピー</button>
+              <button id="copyPositiveBtn">ポジだけコピー</button>
+              <button id="copyNegativeBtn">ネガだけコピー</button>
+              <button id="resetBtn" class="ghost">現在の入力を初期化</button>
+            </div>
+
+            <div class="status" id="autosaveStatus">自動保存の状態: 未保存</div>
+            <div class="hint">※ 入力内容はブラウザに自動保存されます。同じブラウザで再度開くと、前回の内容を復元します。</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd">
+            <h2>保存スロット</h2>
+            <span class="badge">localStorage</span>
+          </div>
+          <div class="bd">
+            <label class="lbl">
+              保存名
+              <input id="slotName" type="text" placeholder="例: キャラクター立ち絵 / 二人構図" />
+            </label>
+            <div class="image-picker">
+              <label class="lbl">保存スロットのサムネイル（任意）
+                <input id="slotImageFile" type="file" accept="image/*" />
+              </label>
+              <div class="row">
+                <img id="imageDraftPreview" class="image-draft-preview" alt="登録予定のサムネイル" />
+                <div class="stack-sm" style="flex: 1 1 160px;">
+                  <div id="imageDraftStatus" class="hint">画像未選択</div>
+                  <button id="clearSlotImageBtn" class="ghost" type="button">画像を外す</button>
+                </div>
+              </div>
+              <div class="hint">画像は端末内で長辺320px以下に縮小され、スロット保存時に登録されます。外部サーバーには送信されません。</div>
+            </div>
+            <div class="row">
+              <button id="saveSlotBtn" class="good">新規保存</button>
+              <button id="overwriteSlotBtn" class="warn">同名を上書き保存</button>
+              <button id="openAllSlotsBtn" type="button">全件一覧</button>
+            </div>
+            <div class="slot-summary-box">
+              <span id="slotCountStatus">保存: 0 / 50</span>
+              <span id="favoriteCountStatus">お気に入り: 0 / 5</span>
+              <span id="slotDisplayStatus">表示: 0 / 10</span>
+            </div>
+            <div id="storageError" class="storage-error" aria-live="polite"></div>
+            <div class="hint">自動保存は編集中の内容を保持します。保存スロットには名前を付けて複数の設定を保存できます。お気に入り最大5件とその他の最新5件を表示します（保存上限50件）。</div>
+            <div id="slotList" class="slot-list"></div>
+            <div style="border-top:1px solid var(--line);padding-top:12px;" class="stack-sm">
+              <strong>保存スロットのバックアップ</strong>
+              <div class="row">
+                <button id="exportBackupBtn" type="button">JSONでバックアップ</button>
+              </div>
+              <label class="lbl">バックアップを読み込む
+                <input id="importBackupFile" type="file" accept=".json,application/json" />
+              </label>
+              <div class="hint">保存スロット・サムネイル・編集中の入力をまとめて移行できます。GitHub Pages版への移行時は、このJSONをご利用ください。</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="hd">
+            <h2>エクスポート / インポート</h2>
+            <span class="badge">コメント見出し対応</span>
+          </div>
+          <div class="bd">
+            <button id="exportTxtBtn" class="primary">統合プロンプトをTXT保存</button>
+            <div class="hint"># ===== Face ===== のようなコメントを含め、ポジティブ・ネガティブを1つのファイルに書き出します。</div>
+            <label class="lbl">インポートするテキスト
+              <textarea id="importText" rows="8" placeholder="# ===== Quality / style =====
+masterpiece, best quality,
+
+# ===== Character =====
+1male, solo, adult male, ..."></textarea>
+            </label>
+            <label class="lbl">またはTXT / Markdownファイルを選択
+              <input id="importFile" type="file" accept=".txt,.md,text/plain,text/markdown" />
+            </label>
+            <label class="lbl">取り込み範囲
+              <select id="importScope">
+                <option value="all">ポジ・ネガ両方（ない項目は空欄に）</option>
+                <option value="positive">ポジのみ（ネガは保持）</option>
+                <option value="negative">ネガのみ（ポジは保持）</option>
+              </select>
+            </label>
+            <button id="importBtn" class="good">見出しから読み込む</button>
+            <div class="hint">同じ分類の見出しが複数ある場合は内容を結合します。例えば Outfit / Upper body と Outfit / Waist は、どちらも「衣装」に読み込まれます。既存の入力内容は上書きされるため、必要に応じて保存スロットに保存してください。</div>
+            <div class="status" id="importStatus" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="panel">
+          <div class="hd">
+            <h2>ポジティブ入力</h2>
+            <span class="badge">Anima向け</span>
+          </div>
+          <div class="bd" id="positiveArea">
+            <div class="section-card">
+              <div class="section-title">画風</div>
+              <div class="section-body">
+                <label class="lbl">画風 / 品質
+                  <textarea data-bind="common.qualityStyle" placeholder="例: masterpiece, best quality, painterly illustration, ..."></textarea>
+                </label>
+              </div>
+            </div>
+
+            <div id="peopleContainer" class="stack"></div>
+
+            <div class="section-card" id="mobSection" style="display:none;">
+              <div class="section-title">モブ・背景人物</div>
+              <div class="section-body">
+                <div class="row">
+                  <label class="lbl" style="flex:1 1 220px;">モブの人数
+                    <select id="mobCount">
+                      <option value="0">群衆（人数指定なし）</option>
+                      <option value="1">1人</option>
+                      <option value="2">2人</option>
+                      <option value="3">3人</option>
+                      <option value="4">4人</option>
+                      <option value="5">5人</option>
+                    </select>
+                  </label>
+                  <label class="lbl" style="flex:1 1 180px;">モブの種類
+                    <select id="mobKind">
+                      <option value="male">男性</option>
+                      <option value="female">女性</option>
+                      <option value="mixed">男女混在・未指定</option>
+                      <option value="other">人外・種別を指定しない</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="lbl">モブの特徴・衣装（カンマ区切り）
+                  <textarea data-bind="mobs.appearance" placeholder="例: spectators, dark robes, simple clothing"></textarea>
+                </label>
+                <label class="lbl">モブの配置・動き（英文、識別記号で指定）
+                  <textarea data-bind="mobs.placement" placeholder="例: C surrounds A and B in a circle. C watches them from the background."></textarea>
+                </label>
+                <div id="mobExampleHint" class="hint">モブ集団には主要人物の次のアルファベットを割り当てます。位置関係は英文で指定できます。</div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-title">共通</div>
+              <div class="section-body">
+                <label class="lbl">構図
+                  <textarea data-bind="common.composition" placeholder="例: standing, facing each other, centered composition, ..."></textarea>
+                </label>
+                <div class="stack-sm">
+                  <label class="lbl" for="cameraPresets">カメラ指定プリセット（日本語 / 英語）</label>
+                  <select id="cameraPresets" aria-label="カメラプリセットを選択">
+                    <option value="">選択するとタグを追加します（繰り返し選択可）</option>
+                  </select>
+                  <label class="lbl">カメラ指定（自由入力・編集可）
+                    <textarea data-bind="common.camera" placeholder="例: from front, close-up, wide-angle lens,"></textarea>
+                  </label>
+                  <div class="preset-help">プルダウンで選択したタグを、下の欄にカンマ区切りで追記します。同じタグを繰り返し追加することもできます。</div>
+                </div>
+                <label class="lbl">光・背景
+                  <textarea data-bind="common.lightBackground" placeholder="例: soft shadows, dramatic bright lighting, ..."></textarea>
+                </label>
+                <label class="lbl">人物同士の関係・位置（英語）
+                  <textarea data-bind="common.characterRelations" placeholder="例: A stands on the left. B stands on the right, facing A. C surrounds both."></textarea>
+                  <span class="hint">複数人物の特徴が混ざらないよう、各人物の位置関係を英文で指定することをおすすめします。</span>
+                </label>
+                <label class="lbl">共通の自然言語
+                  <textarea data-bind="common.commonNaturalLanguage" placeholder="例: A slender young man stands quietly in a light stone interior..."></textarea>
+                </label>
+                <label class="lbl">LoRA
+                  <textarea data-bind="common.lora" placeholder="例: &lt;lora:example_style:0.5&gt;"></textarea>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd">
+            <h2>ネガティブ入力</h2>
+            <span class="badge">コメント付き結合</span>
+          </div>
+          <div class="bd" id="negativeArea">
+            <div class="section-card">
+              <div class="section-title">ネガティブ</div>
+              <div class="section-body">
+                <label class="lbl">品質管理
+                  <textarea data-bind="negative.qualityIssues" placeholder="worst quality, low quality, blurry, ..."></textarea>
+                  <span class="hint">新規作成時には基本タグが入力されています。必要に応じて削除・編集できます。</span>
+                </label>
+                <label class="lbl">望まない画風・質感
+                  <textarea data-bind="negative.unwantedRendering" placeholder="例: glossy skin, plastic skin, 3d, cg, ..."></textarea>
+                </label>
+                <label class="lbl">望まない外見・衣装
+                  <textarea data-bind="negative.unwantedAppearance" placeholder="例: fluffy hair, bulky body, heavy armor, ..."></textarea>
+                </label>
+                <label class="lbl">身体・顔の崩れ
+                  <textarea data-bind="negative.anatomyIssues" placeholder="例: bad anatomy, extra arms, deformed eyes, ..."></textarea>
+                </label>
+                <label class="lbl">その他ネガティブ
+                  <textarea data-bind="negative.otherNegative" placeholder="例: 不要な小物、背景、特定要素を英語で指定"></textarea>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd">
+            <h2>統合結果</h2>
+            <span class="badge">そのままコピペ可</span>
+          </div>
+          <div class="bd">
+            <div class="toolbar">
+              <div class="toolbar-left kpi">
+                <span id="positiveStats">ポジ: 0文字</span>
+                <span id="negativeStats">ネガ: 0文字</span>
+                <span id="allStats">統合: 0文字</span>
+              </div>
+              <div class="toolbar-right">
+                <button id="refreshBtn">今すぐ再生成</button>
+              </div>
+            </div>
+
+            <div class="preview">
+              <label class="lbl">ポジティブ統合
+                <textarea id="positivePreview" readonly></textarea>
+              </label>
+              <label class="lbl">ネガティブ統合
+                <textarea id="negativePreview" readonly></textarea>
+              </label>
+            </div>
+            <label class="lbl">ポジ＋ネガ統合
+              <textarea id="allPreview" readonly style="min-height:280px;"></textarea>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="site-footer">
+      <div class="footer-section">
+        <p class="footer-heading">プライバシー・免責事項</p>
+        <p>入力内容・保存したプロンプト・画像は、お使いのブラウザ内のみに保存されます。このツールからGitHub、及び外部サーバーへ送信されることはありません。</p>
+        <p>このツールに保存した内容が、自動的にウェブ上で公開・共有されることはありません。</p>
+        <p>ブラウザのデータ削除などで失われる場合があります。大切なデータはJSONでバックアップしてください。</p>
+        <p>本ツールの利用に関連して生じたデータの消失、損害、トラブル、第三者との紛争等について、制作者は法令上認められる範囲で責任を負いません。</p>
+      </div>
+      <p>Updated: 2026.10.20 | © 2026 <a href="https://x.com/mukyouan" target="_blank" rel="noopener noreferrer">@mukyouan</a></p>
+    </footer>
+  </div>
+
+  <div class="slot-modal" id="allSlotsModal" aria-hidden="true">
+    <div class="slot-modal-panel panel">
+      <div class="hd">
+        <h2>保存スロット一覧</h2>
+        <div class="row">
+          <input id="slotSearchInput" type="text" placeholder="保存名で検索" style="max-width:220px;" />
+          <button id="closeAllSlotsBtn" type="button">閉じる</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="slot-summary-box">
+          <span id="slotModalSummary">0件</span>
+          <span class="slot-note">お気に入りは最大5件まで登録できます。この画面ではすべての保存スロットを管理できます。</span>
+        </div>
+        <div id="allSlotList" class="slot-modal-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'anima_prompt_manager_autosave_v5';
+    const SLOT_KEY = 'anima_prompt_manager_slots_v5';
+    const DRAFT_THUMB_KEY = 'anima_prompt_manager_draft_thumbnail_v5';
+    const MAX_SLOTS = 50;
+    const MAX_FAVORITES = 5;
+    const PREVIEW_FAVORITES = 5;
+    const PREVIEW_RECENTS = 5;
+
+    const CAMERA_PRESETS = [
+      ['方向・角度', [
+        ['正面から（from front）', 'from front'],
+        ['横から（from side）', 'from side'],
+        ['後ろから（from behind）', 'from behind'],
+        ['斜め前から（three-quarter view）', 'three-quarter view'],
+        ['俯瞰・上から（from above）', 'from above'],
+        ['真上に近い俯瞰（bird\'s eye view）', "bird's eye view"],
+        ['アオリ・下から（from below）', 'from below'],
+        ['強いアオリ（worm\'s eye view）', "worm's eye view"],
+        ['傾いたカメラ（dutch angle）', 'dutch angle']
+      ]],
+      ['距離・切り取り', [
+        ['顔のアップ（face close-up）', 'face close-up'],
+        ['クローズアップ（close-up）', 'close-up'],
+        ['上半身（upper body）', 'upper body'],
+        ['太ももから上（cowboy shot）', 'cowboy shot'],
+        ['全身（full body）', 'full body'],
+        ['引きの構図（wide shot）', 'wide shot'],
+        ['遠景（long shot）', 'long shot']
+      ]],
+      ['レンズ・遠近感', [
+        ['広角レンズ（wide-angle lens）', 'wide-angle lens'],
+        ['超広角レンズ（extreme wide-angle lens）', 'extreme wide-angle lens'],
+        ['魚眼（fisheye）', 'fisheye'],
+        ['奥行きを強調（perspective）', 'perspective'],
+        ['手前を大きく見せる（foreshortening）', 'foreshortening']
+      ]]
+    ];
+
+    function makeEmptyPerson() {
+      return {
+        character: '',
+        face: '',
+        hair: '',
+        outfit: '',
+        naturalLanguage: ''
+      };
+    }
+
+    function makeDefaultState() {
+      return {
+        personCount: 1,
+        common: {
+          qualityStyle: '',
+          composition: '',
+          camera: '',
+          lightBackground: '',
+          characterRelations: '',
+          commonNaturalLanguage: '',
+          lora: ''
+        },
+        people: [makeEmptyPerson()],
+        mobs: {
+          enabled: false,
+          count: 0,
+          kind: 'male',
+          appearance: '',
+          placement: ''
+        },
+        negative: {
+          qualityIssues: 'worst quality, low quality, blurry, jpeg artifacts, text, watermark, signature, artist name',
+          unwantedRendering: '',
+          unwantedAppearance: '',
+          anatomyIssues: '',
+          otherNegative: ''
+        }
+      };
+    }
+
+    let state = loadAutosave() || makeDefaultState();
+    normalizeState(state);
+
+    const el = {
+      personCount: document.getElementById('personCount'),
+      cameraPresets: document.getElementById('cameraPresets'),
+      peopleContainer: document.getElementById('peopleContainer'),
+      enableMobs: document.getElementById('enableMobs'),
+      mobSection: document.getElementById('mobSection'),
+      mobCount: document.getElementById('mobCount'),
+      mobKind: document.getElementById('mobKind'),
+      mobExampleHint: document.getElementById('mobExampleHint'),
+      positivePreview: document.getElementById('positivePreview'),
+      negativePreview: document.getElementById('negativePreview'),
+      allPreview: document.getElementById('allPreview'),
+      copyAllBtn: document.getElementById('copyAllBtn'),
+      copyPositiveBtn: document.getElementById('copyPositiveBtn'),
+      copyNegativeBtn: document.getElementById('copyNegativeBtn'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      autosaveStatus: document.getElementById('autosaveStatus'),
+      slotName: document.getElementById('slotName'),
+      saveSlotBtn: document.getElementById('saveSlotBtn'),
+      overwriteSlotBtn: document.getElementById('overwriteSlotBtn'),
+      openAllSlotsBtn: document.getElementById('openAllSlotsBtn'),
+      closeAllSlotsBtn: document.getElementById('closeAllSlotsBtn'),
+      slotSearchInput: document.getElementById('slotSearchInput'),
+      allSlotsModal: document.getElementById('allSlotsModal'),
+      allSlotList: document.getElementById('allSlotList'),
+      slotModalSummary: document.getElementById('slotModalSummary'),
+      slotList: document.getElementById('slotList'),
+      slotCountStatus: document.getElementById('slotCountStatus'),
+      favoriteCountStatus: document.getElementById('favoriteCountStatus'),
+      slotDisplayStatus: document.getElementById('slotDisplayStatus'),
+      storageError: document.getElementById('storageError'),
+      slotImageFile: document.getElementById('slotImageFile'),
+      imageDraftPreview: document.getElementById('imageDraftPreview'),
+      imageDraftStatus: document.getElementById('imageDraftStatus'),
+      clearSlotImageBtn: document.getElementById('clearSlotImageBtn'),
+      exportBackupBtn: document.getElementById('exportBackupBtn'),
+      importBackupFile: document.getElementById('importBackupFile'),
+      toast: document.getElementById('toast'),
+      positiveStats: document.getElementById('positiveStats'),
+      negativeStats: document.getElementById('negativeStats'),
+      allStats: document.getElementById('allStats'),
+      exportTxtBtn: document.getElementById('exportTxtBtn'),
+      importText: document.getElementById('importText'),
+      importFile: document.getElementById('importFile'),
+      importScope: document.getElementById('importScope'),
+      importBtn: document.getElementById('importBtn'),
+      importStatus: document.getElementById('importStatus')
+    };
+
+    function setupCameraPresets() {
+      for (const [groupName, items] of CAMERA_PRESETS) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = groupName;
+        for (const [label, value] of items) {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = label;
+          optgroup.appendChild(option);
+        }
+        el.cameraPresets.appendChild(optgroup);
+      }
+    }
+    function appendCameraPreset(value) {
+      if (!value) return;
+      const box = document.querySelector('[data-bind="common.camera"]');
+      const original = String(state.common.camera || '').trim();
+      const normalized = original.replace(/,?\s*$/, '');
+      const combined = normalized ? normalized + ', ' + value + ',' : value + ',';
+      state.common.camera = combined;
+      box.value = combined;
+      updatePreviews();
+      scheduleSave();
+      el.cameraPresets.value = '';
+      box.focus();
+    }
+
+    function normalizeState(s) {
+      if (!s || typeof s !== 'object') s = makeDefaultState();
+      s.personCount = clampInt(s.personCount || 1, 1, 6);
+      s.common = Object.assign(makeDefaultState().common, s.common || {});
+      s.mobs = Object.assign(makeDefaultState().mobs, s.mobs || {});
+      s.mobs.enabled = Boolean(s.mobs.enabled);
+      s.mobs.count = clampInt(s.mobs.count, 0, 5);
+      if (!['male', 'female', 'mixed', 'other'].includes(s.mobs.kind)) s.mobs.kind = 'mixed';
+      s.negative = Object.assign(makeDefaultState().negative, s.negative || {});
+      s.people = Array.isArray(s.people) ? s.people : [];
+      while (s.people.length < s.personCount) s.people.push(makeEmptyPerson());
+      if (s.people.length > 6) s.people.length = 6;
+      for (let i = 0; i < s.people.length; i++) {
+        s.people[i] = Object.assign(makeEmptyPerson(), s.people[i] || {});
+      }
+      return s;
+    }
+
+    function clampInt(value, min, max) {
+      const n = parseInt(value, 10);
+      if (Number.isNaN(n)) return min;
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function deepSetByPath(obj, path, value) {
+      const parts = path.split('.');
+      let cur = obj;
+      for (let i = 0; i < parts.length - 1; i++) {
+        const p = parts[i];
+        const nextIsIndex = /^\d+$/.test(parts[i + 1]);
+        if (!(p in cur) || cur[p] == null) cur[p] = nextIsIndex ? [] : {};
+        cur = cur[p];
+      }
+      cur[parts[parts.length - 1]] = value;
+    }
+
+    function getByPath(obj, path) {
+      return path.split('.').reduce((acc, key) => acc?.[key], obj);
+    }
+
+    function loadAutosave() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveAutosave() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        el.autosaveStatus.textContent = '自動保存の状態: 保存済み (' + new Date().toLocaleString('ja-JP') + ')';
+      } catch (e) {
+        el.autosaveStatus.textContent = '自動保存の状態: 保存失敗';
+      }
+    }
+
+    function normalizeSlot(slot) {
+      if (!slot || typeof slot !== 'object') return null;
+      const name = String(slot.name || '').trim();
+      if (!name) return null;
+      return {
+        name,
+        updatedAt: slot.updatedAt || new Date().toISOString(),
+        lastUsedAt: slot.lastUsedAt || slot.updatedAt || new Date().toISOString(),
+        favorite: Boolean(slot.favorite),
+        state: normalizeState(slot.state || makeDefaultState()),
+        thumbnail: validThumbnail(slot.thumbnail)
+      };
+    }
+
+    function loadSlots() {
+      try {
+        const raw = localStorage.getItem(SLOT_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed.map(normalizeSlot).filter(Boolean) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setStorageError(message = '') {
+      if (!message) {
+        el.storageError.textContent = '';
+        el.storageError.classList.remove('show');
+        return;
+      }
+      el.storageError.textContent = message;
+      el.storageError.classList.add('show');
+    }
+
+    // 保存した画像はローカルのブラウザ内のみ。画像は縮小済みData URLとして保持する。
+    function validThumbnail(value) {
+      return typeof value === 'string' &&
+        value.length < 400000 &&
+        /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(value)
+        ? value : null;
+    }
+
+    let thumbnailDraft = (() => {
+      try { return validThumbnail(localStorage.getItem(DRAFT_THUMB_KEY)); }
+      catch { return null; }
+    })();
+    let thumbnailTouched = Boolean(thumbnailDraft);
+
+    function setThumbnailDraft(value, touched = true) {
+      thumbnailDraft = validThumbnail(value);
+      thumbnailTouched = touched;
+      try {
+        if (thumbnailDraft) localStorage.setItem(DRAFT_THUMB_KEY, thumbnailDraft);
+        else localStorage.removeItem(DRAFT_THUMB_KEY);
+      } catch (_) { showToast('画像の一時保存に失敗しました。ブラウザの保存容量をご確認ください。'); }
+      renderThumbnailDraft();
+    }
+
+    function renderThumbnailDraft() {
+      if (thumbnailDraft) {
+        el.imageDraftPreview.src = thumbnailDraft;
+        el.imageDraftPreview.classList.add('visible');
+        el.imageDraftStatus.textContent = '登録する画像を選択中';
+      } else {
+        el.imageDraftPreview.removeAttribute('src');
+        el.imageDraftPreview.classList.remove('visible');
+        el.imageDraftStatus.textContent = thumbnailTouched
+          ? '画像なしで保存（上書き時は画像を削除）'
+          : '画像未選択（上書き時は既存画像を保持）';
+      }
+    }
+
+    async function makeThumbnail(file) {
+      if (!file || !file.type.startsWith('image/')) throw new Error('画像ファイルを選択してください。');
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      try {
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = () => reject(new Error('画像を開けませんでした。'));
+          img.src = objectUrl;
+        });
+        if (!img.naturalWidth || !img.naturalHeight) throw new Error('画像のサイズを読み取れませんでした。');
+        const maxSide = 320;
+        let scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('画像の縮小処理を開始できませんでした。');
+        let result = '';
+        for (let step = 0; step < 4; step++) {
+          canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+          ctx.fillStyle = '#171a21';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          result = canvas.toDataURL('image/jpeg', 0.7);
+          if (result.length < 80000) break;
+          scale *= 0.75;
+        }
+        return result;
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
+
+    function saveSlots(slots) {
+      try {
+        localStorage.setItem(SLOT_KEY, JSON.stringify(slots));
+        setStorageError('');
+        return true;
+      } catch (error) {
+        const message = error?.name === 'QuotaExceededError'
+          ? 'ブラウザの保存容量の上限に達したため、保存できませんでした。不要なスロットや画像を削除するか、JSONでバックアップしてからデータを整理してください。'
+          : '保存に失敗しました。ブラウザの保存容量をご確認ください。';
+        setStorageError(message);
+        showToast(message);
+        return false;
+      }
+    }
+
+    function slotSortTime(slot) {
+      return new Date(slot.lastUsedAt || slot.updatedAt || 0).getTime() || 0;
+    }
+
+    function sortSlotsForRecent(slots) {
+      return slots.slice().sort((a, b) => slotSortTime(b) - slotSortTime(a));
+    }
+
+    function findSlotIndexByName(slots, name) {
+      return slots.findIndex(s => s.name === name);
+    }
+
+    function updateSlotCounts(slots, shownCount = 0) {
+      const favoriteCount = slots.filter(s => s.favorite).length;
+      el.slotCountStatus.textContent = `保存: ${slots.length} / ${MAX_SLOTS}`;
+      el.favoriteCountStatus.textContent = `お気に入り: ${favoriteCount} / ${MAX_FAVORITES}`;
+      el.slotDisplayStatus.textContent = `表示: ${shownCount} / ${PREVIEW_FAVORITES + PREVIEW_RECENTS}`;
+    }
+
+    function upsertSlot(name, overwrite = false) {
+      const slotName = (name || '').trim();
+      if (!slotName) {
+        showToast('保存名を入力してください。');
+        return;
+      }
+      const slots = loadSlots();
+      const idx = findSlotIndexByName(slots, slotName);
+      if (idx !== -1 && !overwrite) {
+        showToast('同じ名前の保存スロットが存在します。「同名を上書き保存」を使用してください。');
+        return;
+      }
+      if (idx === -1 && slots.length >= MAX_SLOTS) {
+        const message = `保存件数が上限の${MAX_SLOTS}件に達しています。不要な保存スロットを削除してください。`;
+        setStorageError(message);
+        showToast(message);
+        return;
+      }
+      const now = new Date().toISOString();
+      const thumbnail = thumbnailTouched
+        ? thumbnailDraft
+        : idx >= 0 ? validThumbnail(slots[idx].thumbnail) : null;
+      const payload = {
+        name: slotName,
+        updatedAt: now,
+        lastUsedAt: now,
+        favorite: idx >= 0 ? Boolean(slots[idx].favorite) : false,
+        state: structuredClone(state),
+        thumbnail
+      };
+      if (idx === -1) slots.unshift(payload);
+      else slots[idx] = payload;
+      if (!saveSlots(slots)) return;
+      renderSlots();
+      showToast((idx === -1 ? '保存しました。' : '上書き保存しました。') + ' [' + slotName + ']');
+    }
+
+    function toggleFavorite(index) {
+      const slots = loadSlots();
+      const slot = slots[index];
+      if (!slot) return;
+      const favoriteCount = slots.filter(s => s.favorite).length;
+      if (!slot.favorite && favoriteCount >= MAX_FAVORITES) {
+        const message = `お気に入りは最大${MAX_FAVORITES}件まで登録できます。先にほかのお気に入りを解除してください。`;
+        setStorageError(message);
+        showToast(message);
+        return;
+      }
+      slot.favorite = !slot.favorite;
+      slot.updatedAt = slot.updatedAt || new Date().toISOString();
+      if (!saveSlots(slots)) return;
+      renderSlots();
+      showToast(slot.favorite ? 'お気に入りに追加しました。' : 'お気に入りを解除しました。');
+    }
+
+    function touchSlot(index) {
+      const slots = loadSlots();
+      if (!slots[index]) return true;
+      slots[index].lastUsedAt = new Date().toISOString();
+      return saveSlots(slots);
+    }
+
+    function renderSlotCard(slot, index) {
+      const thumb = validThumbnail(slot.thumbnail);
+      const starLabel = slot.favorite ? '★' : '☆';
+      const starAction = slot.favorite ? 'お気に入りから外す' : 'お気に入りに登録';
+      return `
+        <div class="slot-item">
+          <div class="slot-topline">
+            <div class="slot-name">${escapeHtml(slot.name)}</div>
+            <button data-action="favorite" data-index="${index}" class="star-btn ${slot.favorite ? 'active' : ''}" type="button" aria-label="${starAction}" title="${starAction}" aria-pressed="${slot.favorite}">${starLabel}</button>
+          </div>
+          <div class="slot-time">${formatTime(slot.updatedAt)}</div>
+          <div class="slot-main">
+            ${thumb ? `<img class="slot-thumb" src="${thumb}" alt="保存画像のサムネイル" loading="lazy">` : `<div class="slot-thumb" aria-hidden="true"></div>`}
+            <div class="slot-side">
+              <div class="slot-actions">
+                <button data-action="load" data-index="${index}" class="primary" type="button">読込</button>
+                <button data-action="delete" data-index="${index}" class="bad" type="button">削除</button>
+                <button data-action="renamefill" data-index="${index}" class="slot-fill-name" type="button">名前を入力欄へ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindSlotActionButtons(root) {
+      root.querySelectorAll('button[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.index, 10);
+          const action = btn.dataset.action;
+          const slots = loadSlots();
+          const slot = slots[idx];
+          if (!slot) return;
+          if (action === 'load') {
+            state = normalizeState(structuredClone(slot.state));
+            el.slotName.value = slot.name;
+            setThumbnailDraft(slot.thumbnail || null, true);
+            touchSlot(idx);
+            renderAll();
+            scheduleSave();
+            showToast('読み込みました。 [' + slot.name + ']');
+          }
+          if (action === 'renamefill') {
+            el.slotName.value = slot.name;
+            showToast('保存名欄に入力しました。');
+          }
+          if (action === 'delete') {
+            if (!confirm('保存スロット「' + slot.name + '」を削除しますか？')) return;
+            slots.splice(idx, 1);
+            if (!saveSlots(slots)) return;
+            renderSlots();
+            showToast('削除しました。');
+          }
+          if (action === 'favorite') {
+            toggleFavorite(idx);
+          }
+        });
+      });
+    }
+
+    function renderAllSlotsModal() {
+      const slots = sortSlotsForRecent(loadSlots());
+      const q = (el.slotSearchInput.value || '').trim().toLowerCase();
+      const filtered = q ? slots.filter(s => s.name.toLowerCase().includes(q)) : slots;
+      el.slotModalSummary.textContent = `${filtered.length}件 / 全${slots.length}件`;
+      el.allSlotList.innerHTML = filtered.length
+        ? filtered.map(slot => renderSlotCard(slot, findSlotIndexByName(loadSlots(), slot.name))).join('')
+        : '<div class="hint">条件に一致する保存スロットがありません。</div>';
+      bindSlotActionButtons(el.allSlotList);
+    }
+
+    function renderSlots() {
+      const slots = loadSlots();
+      el.slotList.innerHTML = '';
+      if (!slots.length) {
+        updateSlotCounts(slots, 0);
+        const div = document.createElement('div');
+        div.className = 'hint';
+        div.textContent = '保存スロットはまだありません。';
+        el.slotList.appendChild(div);
+        renderAllSlotsModal();
+        return;
+      }
+      const favorites = sortSlotsForRecent(slots.filter(s => s.favorite)).slice(0, PREVIEW_FAVORITES);
+      const favoriteNames = new Set(favorites.map(s => s.name));
+      const recents = sortSlotsForRecent(slots.filter(s => !favoriteNames.has(s.name))).slice(0, PREVIEW_RECENTS);
+      const sections = [];
+      if (favorites.length) sections.push(['お気に入り', favorites]);
+      if (recents.length) sections.push(['その他の最新', recents]);
+      sections.forEach(([title, list]) => {
+        const titleNode = document.createElement('div');
+        titleNode.className = 'slot-section-title';
+        titleNode.textContent = title;
+        el.slotList.appendChild(titleNode);
+        list.forEach(slot => {
+          const originalIndex = findSlotIndexByName(slots, slot.name);
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = renderSlotCard(slot, originalIndex);
+          el.slotList.appendChild(wrapper.firstElementChild);
+        });
+      });
+      bindSlotActionButtons(el.slotList);
+      updateSlotCounts(slots, favorites.length + recents.length);
+      renderAllSlotsModal();
+    }
+
+    function exportBackup() {
+      const backup = {
+        format: 'anima-prompt-manager-backup',
+        version: 4,
+        exportedAt: new Date().toISOString(),
+        current: structuredClone(state),
+        draftThumbnail: thumbnailDraft,
+        slots: loadSlots()
+      };
+      downloadText('anima_prompt_backup_' + new Date().toISOString().slice(0, 10) + '.json',
+        JSON.stringify(backup, null, 2), 'application/json;charset=utf-8');
+      showToast('保存スロットと画像のバックアップを作成しました。');
+    }
+
+    async function importBackup(file) {
+      if (!file) return;
+      try {
+        if (file.size > 20000000) throw new Error('ファイルサイズが上限を超えています。');
+        const backup = JSON.parse(await file.text());
+        if (backup.format !== 'anima-prompt-manager-backup' ||
+            !Array.isArray(backup.slots) || !backup.current || typeof backup.current !== 'object') {
+          throw new Error('このツールのJSONバックアップではありません。');
+        }
+        const slots = backup.slots.slice(0, MAX_SLOTS).map(normalizeSlot).filter(Boolean);
+        if (!confirm(`バックアップの保存スロット${slots.length}件と編集中の入力を復元します。
+現在の保存スロットは上書きされます。続行しますか？`)) return;
+        if (!saveSlots(slots)) return;
+        state = normalizeState(backup.current);
+        setThumbnailDraft(backup.draftThumbnail || null, Boolean(backup.draftThumbnail));
+        renderAll();
+        saveAutosave();
+        showToast('JSONバックアップを復元しました。');
+      } catch (error) {
+        showToast('バックアップを読み込めませんでした: ' + error.message);
+      }
+    }
+
+    function formatTime(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleString('ja-JP');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function createPersonUI(index) {
+      const personNum = index + 1;
+      const multiple = state.personCount > 1 || state.mobs.enabled;
+      const title = multiple ? `人物${String.fromCharCode(65 + index)}（${personNum}人目）` : '人物';
+      const details = document.createElement('details');
+      details.className = 'person';
+      details.open = true;
+      details.innerHTML = `
+        <summary>
+          <span>${title}</span>
+          <span class="badge">${multiple ? '主役' : '単体'}</span>
+        </summary>
+        <div class="person-body">
+          <label class="lbl">人物
+            <textarea data-bind="people.${index}.character" placeholder="例: 1male, solo, adult male, handsome young man, ..."></textarea>
+          </label>
+          <label class="lbl">顔
+            <textarea data-bind="people.${index}.face" placeholder="例: soft wistful expression, slightly melancholic, ..."></textarea>
+          </label>
+          <label class="lbl">髪
+            <textarea data-bind="people.${index}.hair" placeholder="例: black hair, short layered hair, long bangs covering the right eye, ..."></textarea>
+          </label>
+          <label class="lbl">衣装
+            <textarea data-bind="people.${index}.outfit" placeholder="例: fantasy scholar outfit, western fantasy court official attire, ..."></textarea>
+          </label>
+          <label class="lbl">自然言語
+            <textarea data-bind="people.${index}.naturalLanguage" placeholder="例: A slender young man stands quietly in a stone corridor..."></textarea>
+          </label>
+        </div>
+      `;
+      return details;
+    }
+
+    // 項目の日本語ラベル横に、コピー・インポートで使う英語見出しを併記する。
+    const FIELD_HEADINGS = {
+      'common.qualityStyle': 'Quality / style',
+      'common.composition': 'Composition',
+      'common.camera': 'Camera / framing',
+      'common.lightBackground': 'Light / background',
+      'common.characterRelations': 'Character relationships',
+      'common.commonNaturalLanguage': 'Common natural language',
+      'mobs.appearance': 'Background characters',
+      'mobs.placement': 'Background character positions',
+      'common.lora': 'LoRA',
+      'negative.qualityIssues': 'Quality issues',
+      'negative.unwantedRendering': 'Unwanted rendering',
+      'negative.unwantedAppearance': 'Unwanted appearance / costume',
+      'negative.anatomyIssues': 'Anatomy / face errors',
+      'negative.otherNegative': 'Other negative' 
+    };
+    const PERSON_HEADINGS = {
+      character: 'Character', face: 'Face', hair: 'Hair',
+      outfit: 'Outfit', naturalLanguage: 'Natural language'
+    };
+    function getHeadingForField(path) {
+      if (FIELD_HEADINGS[path]) return FIELD_HEADINGS[path];
+      const person = /^people\.(\d+)\.(\w+)$/.exec(path);
+      if (!person) return '';
+      const label = PERSON_HEADINGS[person[2]];
+      return label ? label + ((state.personCount > 1 || state.mobs.enabled) ? ' ' + String.fromCharCode(65 + Number(person[1])) : '') : '';
+    }
+
+    function bindStaticInputs() {
+      document.querySelectorAll('[data-bind]').forEach(node => {
+        const path = node.dataset.bind;
+        const currentValue = getByPath(state, path) ?? '';
+        if (node.value !== currentValue) node.value = currentValue;
+        const label = node.closest('label.lbl');
+        if (!label) return;
+        let heading = label.querySelector(':scope > .field-label');
+        if (!heading) {
+          const firstText = label.firstChild;
+          const japaneseName = firstText?.nodeType === Node.TEXT_NODE ? firstText.textContent.trim() : '';
+          if (firstText?.nodeType === Node.TEXT_NODE) firstText.textContent = '';
+          heading = document.createElement('span');
+          heading.className = 'field-label';
+          const title = document.createElement('span');
+          title.textContent = japaneseName;
+          const code = document.createElement('code');
+          code.className = 'field-code';
+          heading.append(title, code);
+          label.insertBefore(heading, node);
+        }
+        heading.querySelector('.field-code').textContent = '# ===== ' + getHeadingForField(path) + ' =====';
+      });
+    }
+
+    function renderPeople() {
+      el.peopleContainer.innerHTML = '';
+      while (state.people.length < state.personCount) state.people.push(makeEmptyPerson());
+      for (let i = 0; i < state.personCount; i++) {
+        const ui = createPersonUI(i);
+        el.peopleContainer.appendChild(ui);
+      }
+    }
+
+    // 人数が複数の場合だけ、入力欄はそのままで単独人数タグを出力から除く。
+    function removeSoloCountTags(value) {
+      return String(value || '').split(',')
+        .filter(part => !/^(solo|1male|1female|1boy|1girl|1man|1woman|only one person|single person)$/i.test(part.trim()))
+        .join(',').trim().replace(/,\s*$/, '');
+    }
+
+    // 入力済みカンマタグをなるべく保持し、A/Bの短い英文へ挿入する。
+    function labelPersonValue(letter, verb, value) {
+      const text = removeSoloCountTags(value).trim().replace(/^[,\s]+|[,\s]+$/g, '');
+      return text ? `(${letter} ${verb} ${text})` : '';
+    }
+
+    function guessGender(person) {
+      const info = String(person?.character || '').toLowerCase();
+      const male = /(?:^|[,\s])(?:1boy|1male|adult male|male|man|boy)(?:$|[,\s])/.test(info);
+      const female = /(?:^|[,\s])(?:1girl|1female|adult female|female|woman|girl)(?:$|[,\s])/.test(info);
+      return male && !female ? 'male' : female && !male ? 'female' : 'unknown';
+    }
+
+    function countTagText() {
+      const subjects = state.people.slice(0, state.personCount);
+      let male = subjects.filter(p => guessGender(p) === 'male').length;
+      let female = subjects.filter(p => guessGender(p) === 'female').length;
+      const mobs = state.mobs.enabled;
+      if (mobs && state.mobs.count === 0) {
+        // 不定数の群衆がいるのに「2boys」と書くと矛盾する。
+        return state.mobs.kind === 'male' && female === 0 && male === state.personCount ? 'multiple boys'
+          : state.mobs.kind === 'female' && male === 0 && female === state.personCount ? 'multiple girls'
+          : 'multiple people';
+      }
+      if (mobs && state.mobs.kind === 'male') male += state.mobs.count;
+      if (mobs && state.mobs.kind === 'female') female += state.mobs.count;
+      const total = state.personCount + (mobs ? state.mobs.count : 0);
+      if (total <= 1) return '';
+      if ((mobs && ['mixed', 'other'].includes(state.mobs.kind)) || male + female !== total) return 'multiple people';
+      return [male ? `${male}boy${male === 1 ? '' : 's'}` : '', female ? `${female}girl${female === 1 ? '' : 's'}` : ''].filter(Boolean).join(', ');
+    }
+
+    function mobDescription() {
+      const gender = {
+        male: {single:'an adult man', group:'adult men', crowd:'adult male spectators'},
+        female: {single:'an adult woman', group:'adult women', crowd:'adult female spectators'},
+        mixed: {single:'a background figure', group:'background people', crowd:'spectators'},
+        other: {single:'a background figure', group:'background figures', crowd:'background figures'}
+      }[state.mobs.kind] || {single:'a background figure',group:'background figures',crowd:'background figures'};
+      if (state.mobs.count === 0) return `a crowd of ${gender.crowd}`;
+      if (state.mobs.count === 1) return `${gender.single}, background character`;
+      return `a group of ${state.mobs.count} ${gender.group}, background characters`;
+    }
+
+    function buildPositiveOutput() {
+      const labeled = state.personCount > 1 || state.mobs.enabled;
+      const blocks = [];
+      pushBlock(blocks, 'Quality / style', state.common.qualityStyle);
+      if (labeled) pushBlock(blocks, 'Subject count', countTagText());
+
+      for (let i = 0; i < state.personCount; i++) {
+        const p = state.people[i] || makeEmptyPerson();
+        const letter = String.fromCharCode(65 + i);
+        const suffix = labeled ? ' ' + letter : '';
+        if (labeled) {
+          pushBlock(blocks, 'Character' + suffix, labelPersonValue(letter, 'is', p.character));
+          pushBlock(blocks, 'Face' + suffix, labelPersonValue(letter, 'has', p.face));
+          pushBlock(blocks, 'Hair' + suffix, labelPersonValue(letter, 'has', p.hair));
+          pushBlock(blocks, 'Outfit' + suffix, labelPersonValue(letter, 'wears', p.outfit));
+          pushBlock(blocks, 'Natural language' + suffix, p.naturalLanguage);
+        } else {
+          pushBlock(blocks, 'Character', p.character);
+          pushBlock(blocks, 'Face', p.face);
+          pushBlock(blocks, 'Hair', p.hair);
+          pushBlock(blocks, 'Outfit', p.outfit);
+          pushBlock(blocks, 'Natural language', p.naturalLanguage);
+        }
+      }
+
+      if (state.mobs.enabled) {
+        const letter = String.fromCharCode(65 + state.personCount);
+        const desc = mobDescription();
+        const appearance = removeSoloCountTags(state.mobs.appearance).trim().replace(/^[,\s]+|[,\s]+$/g, '');
+        pushBlock(blocks, 'Background group ' + letter,
+          `(${letter} is ${desc}${appearance ? ', ' + appearance : ''})`);
+      }
+
+      pushBlock(blocks, 'Composition', labeled ? removeSoloCountTags(state.common.composition) : state.common.composition);
+      pushBlock(blocks, 'Camera / framing', state.common.camera);
+      pushBlock(blocks, 'Character relationships', state.common.characterRelations);
+      if (state.mobs.enabled) pushBlock(blocks, 'Background group positions', state.mobs.placement);
+      pushBlock(blocks, 'Light / background', state.common.lightBackground);
+      pushBlock(blocks, 'Common natural language', state.common.commonNaturalLanguage);
+      pushBlock(blocks, 'LoRA', state.common.lora);
+      return blocks.join('\n\n').trim();
+    }
+
+    function buildNegativeOutput() {
+      const blocks = [];
+      pushBlock(blocks, 'Quality issues', state.negative.qualityIssues);
+      pushBlock(blocks, 'Unwanted rendering', state.negative.unwantedRendering);
+      pushBlock(blocks, 'Unwanted appearance / costume', state.negative.unwantedAppearance);
+      pushBlock(blocks, 'Anatomy / face errors', state.negative.anatomyIssues);
+      pushBlock(blocks, 'Other negative', state.negative.otherNegative);
+      return blocks.join('\n\n').trim();
+    }
+
+    function pushBlock(list, title, content) {
+      const trimmed = (content || '').trim();
+      if (!trimmed) return;
+      list.push(`# ===== ${title} =====\n${trimmed}`);
+    }
+
+    function buildAllOutput() {
+      const pos = buildPositiveOutput();
+      const neg = buildNegativeOutput();
+      const parts = [];
+      if (pos) parts.push('ポジ\n' + pos);
+      if (neg) parts.push('ネガ\n' + neg);
+      return parts.join('\n\n');
+    }
+
+    // コメント見出しから項目への対応。人物番号は末尾の 1〜6 を使う。
+    function locateImportHeading(title) {
+      const h = title.toLowerCase().replace(/[＿_]/g, ' ').replace(/\s+/g, ' ').trim();
+      const negativeMap = [
+        [/^(quality issues|品質管理|品質問題|品質崩れ)/, 'qualityIssues'],
+        [/^(unwanted rendering|望まない画風|望まない質感)/, 'unwantedRendering'],
+        [/^(unwanted appearance\s*\/\s*costume|望まない外見|望まない衣装)/, 'unwantedAppearance'],
+        [/^(anatomy\s*\/\s*face errors|身体・顔の崩れ|anatomy issues)/, 'anatomyIssues'],
+        [/^(other negative|その他ネガティブ|その他ネガ)/, 'otherNegative']
+      ];
+      for (const [pattern, field] of negativeMap) {
+        if (pattern.test(h)) return { kind: 'negative', field };
+      }
+      const commonMap = [
+        [/^(quality\s*\/\s*style|quality|art style|画風|品質・画風)/, 'qualityStyle'],
+        [/^(composition|構図)/, 'composition'],
+        [/^(camera\s*\/\s*framing|camera|カメラ)/, 'camera'],
+        [/^(light\s*\/\s*background|lighting|light|光・背景|背景・光)/, 'lightBackground'],
+        [/^(character relationships|人物同士の関係|人物間の関係)/, 'characterRelations'],
+        [/^(common natural language|共通の自然言語|共通自然言語)/, 'commonNaturalLanguage'],
+        [/^(lora|ローラ)/, 'lora']
+      ];
+      for (const [pattern, field] of commonMap) {
+        if (pattern.test(h)) return { kind: 'common', field };
+      }
+      const personMap = [
+        [/^(character|人物|キャラクター)/, 'character'],
+        [/^(face|顔)/, 'face'],
+        [/^(hair|髪)/, 'hair'],
+        [/^(outfit|costume|衣装|服装)/, 'outfit'],
+        [/^(natural language|自然言語)/, 'naturalLanguage']
+      ];
+      for (const [pattern, field] of personMap) {
+        if (pattern.test(h)) {
+          const letter = h.match(/\b([a-f])$/);
+          const number = h.match(/\b([1-6])$/);
+          return { kind: 'person', field, index: letter ? letter[1].charCodeAt(0) - 97 : number ? Number(number[1]) - 1 : 0 };
+        }
+      }
+      return null;
+    }
+
+    function parseCommentedText(rawText, scope) {
+      const input = String(rawText || '').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+      const result = makeDefaultState();
+      result.negative.qualityIssues = ''; // テキスト取込では省略項目は空欄扱い
+      const unknown = [];
+      const blocks = [];
+      let current = null;
+      let currentSide = null;
+      let unheaded = 0;
+      const flush = () => {
+        if (current) blocks.push({ title: current.title, content: current.lines.join('\n').trim(), side: current.side });
+        current = null;
+      };
+      for (const line of input.split('\n')) {
+        const heading = line.match(/^\s*#\s*={2,}\s*(.*?)\s*={2,}\s*$/);
+        if (heading) {
+          flush();
+          current = { title: heading[1].trim(), lines: [], side: currentSide };
+          continue;
+        }
+        if (/^\s*(ポジ|positive(?: prompt)?|ポジティブ)\s*[:：]?\s*$/i.test(line)) {
+          flush(); currentSide = 'positive'; continue;
+        }
+        if (/^\s*(ネガ|negative(?: prompt)?|ネガティブ)\s*[:：]?\s*$/i.test(line)) {
+          flush(); currentSide = 'negative'; continue;
+        }
+        if (current) current.lines.push(line);
+        else if (line.trim()) unheaded++;
+      }
+      flush();
+      let matched = 0;
+      let largestPerson = 0;
+      const written = new Set();
+      for (const block of blocks) {
+        const lowerTitle = block.title.toLowerCase().trim();
+        if (lowerTitle === 'subject count') continue; // 人数タグは現在の人数から自動再計算
+        const bgGroup = lowerTitle.match(/^background group ([a-g])$/);
+        if (bgGroup || lowerTitle === 'background group positions') {
+          if (scope === 'negative') continue;
+          result.mobs.enabled = true;
+          if (bgGroup) {
+            const match = block.content.match(/^\([A-G] is (.*)\)$/s);
+            const body = match ? match[1] : block.content;
+            const crowdMatch = body.match(/^a crowd of (adult male spectators|adult female spectators|spectators|background figures)(?:,\s*)?/i);
+            const countMatch = body.match(/^a group of (\d+) (adult men|adult women|background people|background figures),?\s*(?:background characters,?\s*)?/i);
+            const singleMatch = body.match(/^(an adult man|an adult woman|a background figure),?\s*(?:background character,?\s*)?/i);
+            let remainder = body;
+            if (crowdMatch) {
+              result.mobs.count = 0;
+              result.mobs.kind = crowdMatch[1].startsWith('adult male') ? 'male' : crowdMatch[1].startsWith('adult female') ? 'female' : crowdMatch[1] === 'spectators' ? 'mixed' : 'other';
+              remainder = body.slice(crowdMatch[0].length);
+            } else if (countMatch) {
+              result.mobs.count = clampInt(countMatch[1], 1, 5);
+              result.mobs.kind = countMatch[2] === 'adult men' ? 'male' : countMatch[2] === 'adult women' ? 'female' : countMatch[2] === 'background people' ? 'mixed' : 'other';
+              remainder = body.slice(countMatch[0].length);
+            } else if (singleMatch) {
+              result.mobs.count = 1;
+              result.mobs.kind = singleMatch[1] === 'an adult man' ? 'male' : singleMatch[1] === 'an adult woman' ? 'female' : 'other';
+              remainder = body.slice(singleMatch[0].length);
+            }
+            result.mobs.appearance = remainder.replace(/^[,\s]+/, '');
+          } else {
+            result.mobs.placement = block.content;
+          }
+          matched++;
+          written.add('mobs');
+          continue;
+        }
+        const dest = locateImportHeading(block.title);
+        if (!dest) { unknown.push(block.title); continue; }
+        const destSide = dest.kind === 'negative' ? 'negative' : 'positive';
+        if (scope !== 'all' && scope !== destSide) continue;
+        if (block.side && block.side !== destSide) { unknown.push(block.title + '（区分が不一致）'); continue; }
+        if (dest.kind === 'person') {
+          largestPerson = Math.max(largestPerson, dest.index + 1);
+          while (result.people.length <= dest.index) result.people.push(makeEmptyPerson());
+        }
+        const path = dest.kind === 'person' ? `people.${dest.index}.${dest.field}` : `${dest.kind}.${dest.field}`;
+        const existing = getByPath(result, path) || '';
+        let content = block.content;
+        if (dest.kind === 'person' && dest.field !== 'naturalLanguage') {
+          content = content.replace(/^\([A-F] (?:is|has|wears) ([\s\S]*?)\)$/, '$1');
+        }
+        deepSetByPath(result, path, [existing, content].filter(Boolean).join('\n'));
+        matched++;
+        written.add(path);
+      }
+      result.personCount = Math.max(1, largestPerson);
+      normalizeState(result);
+      return { result, matched, fieldCount: written.size, unknown, unheaded, blocks: blocks.length };
+    }
+
+    function downloadText(filename, content, mimeType = 'text/plain;charset=utf-8') {
+      const blob = new Blob(['\uFEFF', content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function importFromText() {
+      const rawText = el.importText.value.trim();
+      if (!rawText) { showToast('インポートするテキストを貼り付けてください。'); return; }
+      const scope = el.importScope.value;
+      const parsed = parseCommentedText(rawText, scope);
+      if (parsed.matched === 0) {
+        el.importStatus.textContent = '対応する見出しが見つかりませんでした。# ===== Face ===== の形式になっているかご確認ください。';
+        showToast('対応するコメント見出しがありません。入力内容は変更していません。');
+        return;
+      }
+      const count = parsed.unknown.length;
+      const warning = count ? `\n未対応の見出し${count}件は読み込まれません。` : '';
+      const target = scope === 'positive' ? 'ポジ（ネガは維持）' : scope === 'negative' ? 'ネガ（ポジは維持）' : 'ポジ・ネガ両方';
+      const question = `${target}の欄を置き換えます。\n一致した見出し: ${parsed.matched}件 (${parsed.fieldCount}項目)\n見出しがない項目は空欄になります。${warning}\n\n実行しますか？`;
+      if (!confirm(question)) return;
+      if (scope === 'all') {
+        state = parsed.result;
+      } else if (scope === 'positive') {
+        const oldNegative = structuredClone(state.negative);
+        state = parsed.result;
+        state.negative = oldNegative;
+      } else {
+        state.negative = parsed.result.negative;
+      }
+      state = normalizeState(state);
+      renderAll();
+      scheduleSave();
+      const extra = parsed.unknown.length ? ` 未対応見出し：${parsed.unknown.join('、')}` : '';
+      const unheadedText = parsed.unheaded ? ` 見出しなしの行：${parsed.unheaded}行（無視）` : '';
+      el.importStatus.textContent = `読み込み完了：${parsed.matched}見出し、${parsed.fieldCount}項目。${extra}${unheadedText}`;
+      showToast('コメント見出しを読み取り、入力欄に反映しました。');
+    }
+
+    function updatePreviews() {
+      const pos = buildPositiveOutput();
+      const neg = buildNegativeOutput();
+      const all = buildAllOutput();
+      el.positivePreview.value = pos;
+      el.negativePreview.value = neg;
+      el.allPreview.value = all;
+      el.positiveStats.textContent = `ポジ: ${pos.length.toLocaleString()}文字`;
+      el.negativeStats.textContent = `ネガ: ${neg.length.toLocaleString()}文字`;
+      el.allStats.textContent = `統合: ${all.length.toLocaleString()}文字`;
+    }
+
+    async function copyText(text, label) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(label + 'をコピーしました。');
+      } catch (e) {
+        fallbackCopy(text);
+        showToast(label + 'をコピーしました。');
+      }
+    }
+
+    function fallbackCopy(text) {
+      const tmp = document.createElement('textarea');
+      tmp.value = text;
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand('copy');
+      tmp.remove();
+    }
+
+    let saveTimer = null;
+    function scheduleSave() {
+      clearTimeout(saveTimer);
+      el.autosaveStatus.textContent = '自動保存の状態: 保存待ち…';
+      saveTimer = setTimeout(() => {
+        saveAutosave();
+      }, 250);
+    }
+
+    function showToast(text) {
+      el.toast.textContent = text;
+      el.toast.classList.add('show');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        el.toast.classList.remove('show');
+      }, 2200);
+    }
+
+    document.addEventListener('input', (ev) => {
+      const node = ev.target;
+      if (!(node instanceof HTMLElement)) return;
+      if (!node.matches('[data-bind]')) return;
+      const path = node.dataset.bind;
+      deepSetByPath(state, path, node.value);
+      updatePreviews();
+      scheduleSave();
+    });
+
+    function resetCurrent() {
+      if (!confirm('現在の入力内容を初期化しますか？\n保存スロットは削除されません。')) return;
+      state = makeDefaultState();
+      setThumbnailDraft(null, false);
+      el.slotName.value = '';
+      renderAll();
+      scheduleSave();
+      showToast('現在の入力を初期化しました。');
+    }
+
+    function renderAll() {
+      normalizeState(state);
+      el.personCount.value = state.personCount;
+      el.enableMobs.checked = state.mobs.enabled;
+      el.mobSection.style.display = state.mobs.enabled ? '' : 'none';
+      el.mobCount.value = state.mobs.count;
+      el.mobKind.value = state.mobs.kind;
+      const mainLetters = Array.from({length:state.personCount}, (_, i) => String.fromCharCode(65 + i));
+      const mobLetter = String.fromCharCode(65 + state.personCount);
+      const mainText = mainLetters.length === 1 ? mainLetters[0]
+        : mainLetters.slice(0, -1).join(', ') + ' and ' + mainLetters[mainLetters.length - 1];
+      const mobPlacement = document.querySelector('[data-bind="mobs.placement"]');
+      mobPlacement.placeholder = `例: ${mobLetter} surrounds ${mainText}. ${mobLetter} watches from the background.`;
+      el.mobExampleHint.textContent = `主役${mainText}、モブ集団${mobLetter}として出力。モブの位置や動作はこの欄に英文で追記できます。`;
+      renderPeople();
+      bindStaticInputs();
+      updatePreviews();
+      renderSlots();
+      renderThumbnailDraft();
+    }
+
+    el.personCount.addEventListener('input', () => {
+      state.personCount = clampInt(el.personCount.value, 1, 6);
+      normalizeState(state);
+      renderAll();
+      scheduleSave();
+    });
+    el.enableMobs.addEventListener('change', () => {
+      state.mobs.enabled = el.enableMobs.checked;
+      renderAll();
+      scheduleSave();
+    });
+    el.mobCount.addEventListener('change', () => {
+      state.mobs.count = clampInt(el.mobCount.value, 0, 5);
+      updatePreviews();
+      scheduleSave();
+    });
+    el.mobKind.addEventListener('change', () => {
+      state.mobs.kind = el.mobKind.value;
+      updatePreviews();
+      scheduleSave();
+    });
+
+    el.exportTxtBtn.addEventListener('click', () => {
+      const text = buildAllOutput();
+      if (!text) { showToast('書き出すプロンプトがありません。'); return; }
+      downloadText('anima_prompt_' + new Date().toISOString().slice(0,10) + '.txt', text);
+      showToast('コメント付きTXTを書き出しました。');
+    });
+    el.importBtn.addEventListener('click', importFromText);
+    el.importFile.addEventListener('change', async () => {
+      const file = el.importFile.files?.[0];
+      if (!file) return;
+      try {
+        el.importText.value = await file.text();
+        el.importStatus.textContent = `ファイル「${file.name}」を読み込んだ。内容をご確認のうえ、「見出しから読み込む」を押してください。`;
+      } catch (error) {
+        el.importStatus.textContent = 'ファイルを読み込めませんでした。';
+      }
+      el.importFile.value = '';
+    });
+    el.copyAllBtn.addEventListener('click', () => copyText(buildAllOutput(), '統合テキスト'));
+    el.copyPositiveBtn.addEventListener('click', () => copyText(buildPositiveOutput(), 'ポジティブ'));
+    el.copyNegativeBtn.addEventListener('click', () => copyText(buildNegativeOutput(), 'ネガティブ'));
+    el.refreshBtn.addEventListener('click', updatePreviews);
+    el.resetBtn.addEventListener('click', resetCurrent);
+    el.slotImageFile.addEventListener('change', async () => {
+      const file = el.slotImageFile.files?.[0];
+      if (!file) return;
+      el.imageDraftStatus.textContent = '画像を縮小中…';
+      try {
+        const thumbnail = await makeThumbnail(file);
+        setThumbnailDraft(thumbnail, true);
+        showToast('サムネイルを登録しました。保存ボタンで確定してください。');
+      } catch (error) {
+        renderThumbnailDraft();
+        showToast('画像を読み込めませんでした: ' + error.message);
+      } finally {
+        el.slotImageFile.value = '';
+      }
+    });
+    el.clearSlotImageBtn.addEventListener('click', () => setThumbnailDraft(null, true));
+    el.exportBackupBtn.addEventListener('click', exportBackup);
+    el.importBackupFile.addEventListener('change', async () => {
+      await importBackup(el.importBackupFile.files?.[0]);
+      el.importBackupFile.value = '';
+    });
+    el.saveSlotBtn.addEventListener('click', () => upsertSlot(el.slotName.value, false));
+    el.overwriteSlotBtn.addEventListener('click', () => upsertSlot(el.slotName.value, true));
+
+    el.openAllSlotsBtn.addEventListener('click', () => {
+      el.allSlotsModal.classList.add('show');
+      el.allSlotsModal.setAttribute('aria-hidden', 'false');
+      renderAllSlotsModal();
+    });
+    el.closeAllSlotsBtn.addEventListener('click', () => {
+      el.allSlotsModal.classList.remove('show');
+      el.allSlotsModal.setAttribute('aria-hidden', 'true');
+    });
+    el.allSlotsModal.addEventListener('click', (ev) => {
+      if (ev.target === el.allSlotsModal) {
+        el.allSlotsModal.classList.remove('show');
+        el.allSlotsModal.setAttribute('aria-hidden', 'true');
+      }
+    });
+    el.slotSearchInput.addEventListener('input', renderAllSlotsModal);
+    setupCameraPresets();
+    el.cameraPresets.addEventListener('change', () => appendCameraPreset(el.cameraPresets.value));
+
+
+    renderAll();
+    saveAutosave();
+  </script>
+</body>
+</html>
